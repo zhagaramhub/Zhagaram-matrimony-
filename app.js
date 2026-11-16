@@ -101,7 +101,7 @@ function zhApplyLanguage(){
   const title=document.title;
   document.title=zhTranslate(title);
   const switcher=document.getElementById("zhLanguageSwitch");
-  if(switcher) switcher.textContent=zhLanguage==="ta"?"English":"தமிழ்";
+  if(switcher){const label=zhLanguage==="ta"?"English":"தமிழ்";if(switcher.textContent!==label)switcher.textContent=label;}
 }
 function zhSetLanguage(next){
   zhLanguage=next;localStorage.setItem("zhagaram-language",next);zhApplyLanguage();
