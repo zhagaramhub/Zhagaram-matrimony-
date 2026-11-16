@@ -221,7 +221,7 @@ if($("sendPhoneOtp"))$("sendPhoneOtp").addEventListener("click",async()=>{
   const phone=$("loginPhone").value.trim();
   if(!phone){setMessage("authMessage","Enter your mobile number with country code.",true);return;}
   const button=$("sendPhoneOtp");button.disabled=true;setMessage("authMessage","Sending OTP...");
-  try{const {error}=await supabase.auth.signInWithOtp({phone});if(error)throw error;$("otpLabel").hidden=false;$("verifyPhoneOtp").hidden=false;setMessage("authMessage","OTP sent. Enter the code received on your phone.");}
+  try{const {error}=await supabase.auth.signInWithOtp({phone,options:{shouldCreateUser:false}});if(error)throw error;$("otpLabel").hidden=false;$("verifyPhoneOtp").hidden=false;setMessage("authMessage","OTP sent. Enter the code received on your phone.");}
   catch(error){setMessage("authMessage",error.message||"Could not send OTP.",true);}
   finally{button.disabled=false;}
 });
