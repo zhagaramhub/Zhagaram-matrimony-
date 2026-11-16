@@ -34,7 +34,7 @@ const zhReverse = Object.fromEntries(Object.entries(zhTranslations).map(([ta,en]
 let zhLanguage = localStorage.getItem("zhagaram-language") || "ta";
 const zhTranslate = value => {
   const key = String(value ?? "").trim();
-  const dict = zhLanguage === "en" ? zhTranslations : zhReverse;
+  const dict = zhLanguage === "en" ? zhReverse : zhTranslations;
   return dict[key] ? String(value).replace(key,dict[key]) : value;
 };
 function zhApplyLanguage(){
