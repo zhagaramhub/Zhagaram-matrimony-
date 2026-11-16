@@ -71,10 +71,43 @@
 
     <section class="membership" id="membership"><div><span class="section-kicker light-kicker">உங்கள் விருப்பப்படி</span><h2>தொடக்கம் இலவசம்.<br><em>மேலும் வாய்ப்புகள் Premium-ல்.</em></h2><p>இலவச பதிவு மற்றும் Basic Membership மூலம் தொடங்குங்கள். Premium அம்சங்கள் பின்னர் செயல்படுத்தப்படும்.</p></div><div class="membership-box"><div class="membership-row"><span>Free Registration</span><b>இலவசம்</b></div><div class="membership-row"><span>Basic Membership</span><b>இலவசம்</b></div><div class="membership-row"><span>Premium Membership</span><b>விரைவில்</b></div><a class="btn btn-light" href="#register">இப்போது பதிவு செய்யுங்கள் →</a></div></section>
 
-    <section class="final-cta" id="register"><div class="cta-symbol">ழ</div><span class="section-kicker">உங்கள் அடுத்த அத்தியாயம்</span><h2>ஒரு நல்ல தொடக்கத்திற்கு<br><em>இன்றே முதல் படி எடுங்கள்.</em></h2><a class="btn btn-primary" href="#login">இலவசமாக பதிவு செய்யுங்கள் →</a><small>பதிவு மற்றும் Login வசதிகள் விரைவில் செயல்படுத்தப்படும்.</small></section>
+    <section class="auth-section" id="login">
+      <div class="auth-intro"><span class="section-kicker">உறுப்பினர் பகுதி</span><h2>உங்கள் கணக்கைத் தொடங்குங்கள்</h2><p>பாதுகாப்பான பதிவு மற்றும் உள்நுழைவு. உங்கள் தனிப்பட்ட தொடர்பு விவரங்கள் தனியாகச் சேமிக்கப்படும்.</p></div>
+      <div class="auth-card">
+        <div class="auth-tabs"><button type="button" class="auth-tab active" id="showRegister">புதிய பதிவு</button><button type="button" class="auth-tab" id="showLogin">Login</button></div>
+        <form id="registerForm" class="auth-form">
+          <label>மின்னஞ்சல் / Email<input type="email" id="regEmail" required autocomplete="email" placeholder="name@example.com"></label>
+          <label>கடவுச்சொல் / Password<input type="password" id="regPassword" required minlength="8" autocomplete="new-password" placeholder="குறைந்தது 8 எழுத்துகள்"></label>
+          <button class="btn btn-primary" type="submit">இலவசமாக பதிவு செய்க</button>
+        </form>
+        <form id="loginForm" class="auth-form" hidden>
+          <label>மின்னஞ்சல் / Email<input type="email" id="loginEmail" required autocomplete="email"></label>
+          <label>கடவுச்சொல் / Password<input type="password" id="loginPassword" required autocomplete="current-password"></label>
+          <button class="btn btn-primary" type="submit">Login</button>
+        </form>
+        <div class="session-bar" id="sessionBar" hidden><span id="sessionEmail"></span><button type="button" class="btn btn-outline" id="logoutButton">Logout</button></div>
+        <p class="auth-message" id="authMessage" role="status" aria-live="polite">பதிவுக்கு Email சரிபார்ப்பு தேவைப்படலாம்.</p>
+      </div>
+    </section>
+    <section class="profile-create" id="createProfile" hidden>
+      <div class="auth-intro"><span class="section-kicker">உங்கள் விவரங்கள்</span><h2>திருமண Profile உருவாக்குங்கள்</h2><p>உங்கள் அடிப்படை விவரங்களை நிரப்புங்கள். Profile முதலில் சரிபார்ப்புக்காக Pending நிலையில் இருக்கும்.</p></div>
+      <form id="profileForm" class="profile-form">
+        <label>முழுப் பெயர் / Full name<input id="fullName" required maxlength="100"></label>
+        <label>பிறந்த தேதி / Date of birth<input id="dateOfBirth" type="date" required></label>
+        <label>பாலினம் / Gender<select id="gender" required><option value="">தேர்வு செய்க</option><option value="male">ஆண் / Groom</option><option value="female">பெண் / Bride</option><option value="other">Other</option><option value="prefer_not_to_say">Prefer not to say</option></select></label>
+        <label>மதம் / Religion<input id="profileReligion" maxlength="60"></label>
+        <label>சமூகம் / Community<input id="community" maxlength="100"></label>
+        <label>கல்வி / Education<input id="education" maxlength="120"></label>
+        <label>வேலை / Occupation<input id="occupation" maxlength="120"></label>
+        <label>நகரம் / City<input id="city" maxlength="100"></label>
+        <label>மொபைல் எண் / Mobile<input id="mobile" type="tel" inputmode="tel" maxlength="20" required></label>
+        <button class="btn btn-primary" type="submit">Profile சேமிக்கவும்</button>
+      </form>
+      <p class="privacy-note">மொபைல் எண் தனிப்பட்ட profile_private அட்டவணையில் சேமிக்கப்படும்; பொதுத் தேடலில் காட்டப்படாது.</p>
+    </section>
   </main>
   <footer><a class="brand footer-brand" href="#"><span class="brand-mark">ழ</span><span><b>Zhagaram</b><small>MATRIMONY</small></span></a><p>மரியாதை · நம்பிக்கை · தனியுரிமை</p><div><a href="#how">About</a><a href="#membership">Membership</a><a href="#login">Login</a></div><small>© <span id="year"></span> Zhagaram Matrimony. All rights reserved.</small></footer>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <script src="app.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>
