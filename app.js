@@ -78,11 +78,64 @@ const zhTranslations = {
 "பதிவுக்கு Email சரிபார்ப்பு தேவைப்படலாம்.":"Email verification may be required for registration."
 
 };
-const zhReverse = Object.fromEntries(Object.entries(zhTranslations).filter(([source])=>!/[அ-ஹ]/.test(source)).map(([ta,en])=>[en,ta]));
+Object.assign(zhTranslations,{
+"உரிமையாளர் கட்டுப்பாட்டு மையம்":"Owner Control Center",
+"முழுமையான செயல்பாட்டு கண்காணிப்பு":"Complete operations overview",
+"உரிமையாளர் அனுமதி சரிபார்க்கப்படுகிறது...":"Checking owner access...",
+"நிர்வாகி / பணியாளர் கணக்குகள்":"Admin / Staff Accounts",
+"பதிவு செய்யப்பட்ட Email":"Registered email",
+"பணியாளர் (Staff)":"Staff",
+"நிர்வாகி (Admin)":"Administrator",
+"அனுமதி வழங்கு":"Grant access",
+"முதலில் அந்த நபர் இணையதளத்தில் கணக்கு உருவாக்கியிருக்க வேண்டும். Owner அனுமதி இல்லாமல் யாரும் தங்கள் பங்கை மாற்ற முடியாது.":"The person must register first. Only the owner can change roles.",
+"குழு கணக்குகள் இல்லை.":"No team accounts yet.",
+"நீக்கு":"Remove",
+"பணிகளை ஒதுக்குதல்":"Assign tasks",
+"பணியாளரைத் தேர்வு செய்க":"Select a staff member",
+"பணி தலைப்பு":"Task title",
+"கடைசி தேதி":"Due date",
+"விளக்கம்":"Description",
+"பணிக்கான குறிப்புகள்":"Task notes",
+"பணியை ஒதுக்கவும்":"Assign task",
+"இன்னும் பணிகள் ஒதுக்கப்படவில்லை.":"No tasks have been assigned yet.",
+"பணியாளர் பணிப்பலகை":"Staff workspace",
+"உங்களுக்கு ஒதுக்கப்பட்ட பணிகளை இங்கே நிர்வகிக்கலாம்.":"Manage the tasks assigned to you here.",
+"எனக்கு ஒதுக்கப்பட்ட பணிகள்":"My assigned tasks",
+"மொத்தப் பணிகள்":"Total tasks",
+"செய்ய வேண்டியவை":"To do",
+"நிறைவடைந்தவை":"Completed",
+"தொடங்கவில்லை":"Not started",
+"நடைபெறுகிறது":"In progress",
+"நிறைவு":"Completed",
+"குறிப்பிடப்படவில்லை":"Not specified",
+"உங்கள் பணிகள் புதுப்பிக்கப்பட்டன.":"Your tasks are up to date.",
+"உங்களுக்கு இன்னும் பணிகள் ஒதுக்கப்படவில்லை.":"No tasks have been assigned to you yet.",
+"பங்கு வெற்றிகரமாக வழங்கப்பட்டது.":"Role assigned successfully.",
+"பங்கு வழங்க முடியவில்லை.":"Could not assign role.",
+"அனுமதி நீக்கப்பட்டது.":"Access removed.",
+"பணி ஒதுக்கப்பட்டது.":"Task assigned.",
+"Owner CRM தகவல்கள் புதுப்பிக்கப்பட்டன.":"Owner CRM data refreshed.",
+"மரியாதை · நம்பிக்கை · தனியுரிமை":"Respect · Trust · Privacy",
+"உரிமையாளர் கட்டுப்பாட்டு மையம்":"Owner Control Center",
+"நிர்வாகிகள்":"Administrators",
+"பணியாளர்கள்":"Staff",
+"திறந்த பணிகள்":"Open tasks",
+"மொத்த உறுப்பினர்கள்":"Total members",
+"சரிபார்ப்பு நிலுவை":"Pending review",
+"அங்கீகரிக்கப்பட்டவை":"Approved",
+"நிராகரிப்பு / நிறுத்தம்":"Rejected / Suspended",
+"நிர்வாக அனுமதி தேவை.":"Administrator access required.",
+"ZHAGARAM MEMBER ID":"ZHAGARAM MEMBER ID",
+"Owner Panel":"உரிமையாளர் பகுதி",
+"Staff CRM":"பணியாளர் CRM",
+"Admin CRM":"நிர்வாக CRM"
+});
+const zhEnglishToTamil = Object.fromEntries(Object.entries(zhTranslations).filter(([source])=>!/[அ-ஹ]/.test(source)).map(([en,ta])=>[en,ta]));
+const zhTamilToEnglish = Object.fromEntries(Object.entries(zhTranslations).filter(([source])=>/[அ-ஹ]/.test(source)).map(([ta,en])=>[ta,en]));
 let zhLanguage = localStorage.getItem("zhagaram-language") || "ta";
 const zhTranslate = value => {
   const key = String(value ?? "").trim();
-  const dict = zhLanguage === "en" ? zhReverse : zhTranslations;
+  const dict = zhLanguage === "en" ? zhTamilToEnglish : zhEnglishToTamil;
   return dict[key] ? String(value).replace(key,dict[key]) : value;
 };
 function zhApplyLanguage(){
