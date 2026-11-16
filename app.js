@@ -11,7 +11,15 @@ $("menuToggle").addEventListener("click",()=>$("mainNav").classList.toggle("open
 document.querySelectorAll("#mainNav a").forEach(a=>a.addEventListener("click",()=>$("mainNav").classList.remove("open")));
 $("searchForm").addEventListener("submit",event=>{event.preventDefault();const g=$("lookingFor").value,a=$("ageRange").value,r=$("religion").value;let n=0;document.querySelectorAll(".profile-card").forEach(card=>{const age=Number(card.dataset.age);const am=a==="all"||(a==="20-25"&&age>=20&&age<=25)||(a==="26-30"&&age>=26&&age<=30)||(a==="31-35"&&age>=31&&age<=35);const show=am&&(g==="all"||card.dataset.gender===g)&&(r==="all"||card.dataset.religion===r);card.hidden=!show;if(show)n++;});$("emptyState").hidden=n!==0;$("profiles").scrollIntoView({behavior:"smooth"});toast(n?n+" sample profile(s) found":"பொருத்தமான மாதிரி Profile இல்லை");});
 document.querySelectorAll(".profile-visual i").forEach(el=>{el.setAttribute("role","button");el.setAttribute("tabindex","0");const toggle=()=>{el.classList.toggle("saved");el.textContent=el.classList.contains("saved")?"♥":"♡";toast("இது மாதிரி Profile மட்டுமே.");};el.addEventListener("click",toggle);el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggle();}});});
-$("languageToggle").addEventListener("click",()=>toast("English interface update விரைவில்."));
+let currentLanguage="en";
+function applyLanguage(language){
+ currentLanguage=language;
+ document.documentElement.lang=language;
+ document.querySelectorAll("[data-ta][data-en]").forEach(el=>{el.textContent=el.dataset[language];});
+ $("languageToggle").textContent=language==="en"?"தமிழ்":"English";
+}
+$("languageToggle").textContent="தமிழ்";
+$("languageToggle").addEventListener("click",()=>applyLanguage(currentLanguage==="en"?"ta":"en"));
 function setTab(register){$("registerForm").hidden=!register;$("loginForm").hidden=register;$("showRegister").classList.toggle("active",register);$("showLogin").classList.toggle("active",!register);message(register?"புதிய Email கணக்கை உருவாக்குங்கள்.":"உங்கள் Email மற்றும் Password மூலம் உள்நுழையுங்கள்.");}
 $("showRegister").addEventListener("click",()=>setTab(true));$("showLogin").addEventListener("click",()=>setTab(false));
 $("registerForm").addEventListener("submit",async e=>{e.preventDefault();const email=$("regEmail").value.trim(),password=$("regPassword").value;if(password.length<8){message("கடவுச்சொல் குறைந்தது 8 எழுத்துகள் இருக்க வேண்டும்.",true);return;}const btn=e.submitter;btn.disabled=true;message("பதிவு செய்கிறது...");try{const {data,error}=await supabase.auth.signUp({email,password});if(error)throw error;if(data.session){message("கணக்கு உருவானது. இப்போது உங்கள் Profile விவரங்களை நிரப்புங்கள்.");await refreshSession(data.session.user);}else{message("பதிவு கோரிக்கை வெற்றி. உங்கள் Email-க்கு வந்த verification link-ஐ திறந்து, பின்னர் Login செய்யுங்கள்.");}}catch(err){message(err.message||"பதிவு செய்ய முடியவில்லை.",true);}finally{btn.disabled=false;}});
