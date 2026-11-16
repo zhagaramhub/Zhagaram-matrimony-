@@ -18,3 +18,12 @@ if($("profileForm"))$("profileForm").addEventListener("submit",async e=>{e.preve
 async function logout(){const {error}=await supabase.auth.signOut();if(error){toast(error.message);return}location.href="index.html"}
 $("dashboardLogout")?.addEventListener("click",logout);
 supabase.auth.onAuthStateChange((event,session)=>{if(event==="SIGNED_OUT"&&(location.pathname.endsWith("dashboard.html")||location.pathname.endsWith("profile.html")))location.href="login.html"});
+
+// Register the Zhagaram installable web app service worker.
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch((error) => {
+      console.error("Zhagaram offline support could not be enabled:", error);
+    });
+  });
+}
