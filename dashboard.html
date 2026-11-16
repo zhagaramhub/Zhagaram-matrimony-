@@ -2,62 +2,38 @@
 <html lang="ta">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#153d32"><meta name="description" content="உங்கள் தனிப்பட்ட Zhagaram Matrimony உறுப்பினர் Dashboard.">
-<title>Member Dashboard | Zhagaram Matrimony</title>
+<meta name="theme-color" content="#f7f4ed"><meta name="description" content="Zhagaram Matrimony member dashboard.">
+<title>Zhagaram | Member Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;500;600;700;800&family=Noto+Serif+Tamil:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="dashboard-premium.css"><link rel="stylesheet" href="dashboard-ui.css">
 </head>
-<body>
-<header class="site-header">
-<a class="brand" href="index.html"><span class="brand-mark">ழ</span><span><b>Zhagaram</b><small>MATRIMONY</small></span></a>
-<button class="menu-toggle" id="menuToggle" aria-label="Open menu">☰</button>
-<nav id="mainNav"><a href="index.html">Home</a><a href="search.html">Search</a><a href="membership.html">Membership</a><a href="profile.html">My Profile</a></nav>
+<body class="member-home">
+<header class="site-header member-header">
+<a class="brand" href="dashboard.html"><span class="brand-mark">ழ</span><span><b>Zhagaram</b><small>MATRIMONY</small></span></a>
+<button class="dash-logout" id="dashboardLogout" type="button" aria-label="Logout" title="Logout">↪</button>
 </header>
-<main>
-<section class="page-hero compact-hero">
-<span class="section-kicker">உறுப்பினர் பகுதி · MEMBER AREA</span>
-<h1 id="dashboardHeading">வணக்கம்!</h1>
-<p>உங்கள் வாழ்க்கைத் துணை தேடலை நம்பிக்கையுடன் தொடருங்கள்.</p>
+<main class="member-main">
+<section class="member-greeting">
+<div><span class="section-kicker">MEMBER DASHBOARD</span><h1 id="dashboardHeading">வணக்கம்!</h1><p>உங்கள் வாழ்க்கைத் துணை தேடல் இங்கே தொடர்கிறது.</p></div>
+<div class="member-avatar-large" id="memberInitial">Z</div>
 </section>
-<section class="member-dashboard dashboard-page">
-<aside class="member-sidebar" aria-label="Member navigation">
-<div class="member-welcome"><span class="member-avatar" id="memberInitial">Z</span><div><b id="memberName">Member</b><small><span id="memberIdLabel">உறுப்பினர் ID:</span> <span id="memberId">—</span></small></div></div>
-<a class="dash-link active" href="dashboard.html"><span class="dash-icon">▦</span> Dashboard</a>
-<a class="dash-link" href="profile.html"><span class="dash-icon">♙</span> My Profile</a>
-<a class="dash-link" href="search.html"><span class="dash-icon">⌕</span> Search Profiles</a>
-<a class="dash-link" href="profile.html"><span class="dash-icon">✎</span> Edit Profile</a>
-<a class="dash-link" href="membership.html"><span class="dash-icon">◇</span> Membership</a>
-<a class="dash-link" id="ownerNavLink" href="owner.html" hidden><span class="dash-icon">♛</span> Owner Panel</a>
-<a class="dash-link" id="adminNavLink" href="admin.html" hidden><span class="dash-icon">♜</span> Admin Dashboard</a>
-<button class="dash-link" id="dashboardLogout" type="button"><span class="dash-icon">↪</span> Logout</button>
-</aside>
-<div class="dashboard-content">
-<div class="dashboard-top"><div><span class="section-kicker">உங்கள் கணக்கு · YOUR ACCOUNT</span><h2>உங்கள் Dashboard</h2></div><span class="free-chip">MEMBER AREA</span></div>
-<p class="dashboard-intro">உங்கள் சுயவிவரத்தையும் திருமணத் தேடலையும் ஒரே இடத்தில் நிர்வகிக்கலாம்.</p>
-<div class="dash-overview">
-<article class="dash-welcome-card"><span class="dash-eyebrow">A THOUGHTFUL BEGINNING</span><h3>உங்கள் அடுத்த அத்தியாயம் இங்கே தொடங்குகிறது.</h3><p>உங்கள் சுயவிவரத்தை முழுமைப்படுத்தி, உங்களுக்கு ஏற்ற வாழ்க்கைத் துணையைத் தேடத் தொடங்குங்கள்.</p><a class="dash-primary-link" href="profile.html">சுயவிவரத்தைப் புதுப்பிக்க <span>→</span></a></article>
-<article class="dash-status-card"><span>PROFILE REVIEW STATUS</span><strong id="dashStatus">Pending Review</strong><small>உங்கள் சுயவிவரத்தின் நிர்வாகச் சரிபார்ப்பு நிலை</small></article>
-</div>
-<div class="dashboard-cards">
-<article class="dash-stat"><span>MY PROFILE</span><b>சுயவிவரம்</b><small>உங்கள் தனிப்பட்ட விவரங்களைப் பார்க்கவும் புதுப்பிக்கவும்</small><a href="profile.html">விவரங்களைத் திருத்த →</a></article>
-<article class="dash-stat"><span>PROFILE SEARCH</span><b>பொருத்தங்கள்</b><small>வயது, இடம் மற்றும் விருப்பங்களின் அடிப்படையில் தேடுங்கள்</small><a href="search.html">சுயவிவரங்களைத் தேட →</a></article>
-<article class="dash-stat"><span>MEMBERSHIP</span><b>உறுப்பினர் திட்டம்</b><small>உங்கள் கணக்கிற்கான திட்டங்களைப் பார்க்கவும்</small><a href="membership.html">திட்டங்களைப் பார்க்க →</a></article>
-</div>
-<section class="dash-panel"><h3>உங்கள் திருமணத் தேடல் வசதிகள்</h3>
-<div class="dash-actions">
-<a class="dash-action" href="search.html"><span>⌕ &nbsp; பொருத்தமான சுயவிவரங்களைத் தேடுங்கள்</span><b>→</b></a>
-<a class="dash-action" href="profile.html"><span>♡ &nbsp; துணை விருப்பங்களை அமைக்கவும்</span><b>→</b></a>
-<div class="dash-action disabled" aria-disabled="true"><span>♥ &nbsp; விருப்பங்கள் (Interests)<small>அடுத்த கட்டத்தில் செயல்படுத்தப்படும்</small></span><b>·</b></div>
-<div class="dash-action disabled" aria-disabled="true"><span>✉ &nbsp; செய்திகள் (Messages)<small>அடுத்த கட்டத்தில் செயல்படுத்தப்படும்</small></span><b>·</b></div>
-<div class="dash-action disabled" aria-disabled="true"><span>✧ &nbsp; தினசரி பரிந்துரைகள்<small>அடுத்த கட்டத்தில் செயல்படுத்தப்படும்</small></span><b>·</b></div>
-<div class="dash-action disabled" aria-disabled="true"><span>◷ &nbsp; பார்த்த சுயவிவரங்கள்<small>அடுத்த கட்டத்தில் செயல்படுத்தப்படும்</small></span><b>·</b></div>
-</div>
-<p class="dashboard-note">தனியுரிமை முக்கியம். உங்கள் கைபேசி எண் பொதுச் சுயவிவரத் தேடலில் காட்டப்படாது; தனிப்பட்ட விவரங்கள் பாதுகாப்பாக வைக்கப்பட வேண்டும்.</p>
+<section class="member-id-strip"><span>உறுப்பினர் ID</span><strong id="memberId">—</strong><span class="member-id-name" id="memberName">Member</span></section>
+<section class="member-profile-card">
+<div class="profile-card-top"><div><span class="soft-kicker">YOUR PROFILE</span><h2>உங்கள் சுயவிவரம்</h2><p>உங்கள் விவரங்களைச் சரிபார்த்து புதுப்பிக்கவும்.</p></div><span class="profile-symbol">♙</span></div>
+<div class="profile-status-line"><span>சுயவிவர நிலை</span><strong id="dashStatus">Pending Review</strong></div>
+<a class="edit-profile-button" href="profile.html"><span>✎</span> Profile Edit <b>→</b></a>
 </section>
-</div>
-</section>
+<section class="member-privacy-note"><span>♡</span><p>உங்கள் தனிப்பட்ட விவரங்கள் பாதுகாப்பாக வைக்கப்படும். கைபேசி எண் பொதுச் சுயவிவரத்தில் காட்டப்படாது.</p></section>
 </main>
-<footer><a class="brand footer-brand" href="index.html"><span class="brand-mark">ழ</span><span><b>Zhagaram</b><small>MATRIMONY</small></span></a><p>Respect · Trust · Privacy</p><div><a href="index.html">Home</a><a href="membership.html">Membership</a><a href="login.html">Login</a></div><small>© <span id="year"></span> Zhagaram Matrimony. All rights reserved.</small></footer>
-<div class="toast" id="toast" role="status" aria-live="polite"></div><script type="module" src="app.js"></script>
+<nav class="member-bottom-nav" aria-label="Member navigation">
+<a class="bottom-nav-item active" href="dashboard.html"><span class="bottom-icon">⌂</span><small>Home</small></a>
+<a class="bottom-nav-item" href="search.html"><span class="bottom-icon">♡</span><small>Matches</small></a>
+<a class="bottom-nav-item" href="dashboard.html#interests"><span class="bottom-icon">♥</span><small>Interests</small></a>
+<a class="bottom-nav-item" href="dashboard.html#messages"><span class="bottom-icon">✉</span><small>Messages</small></a>
+<a class="bottom-nav-item" href="membership.html"><span class="bottom-icon">✧</span><small>Premium</small></a>
+<a class="bottom-nav-item" href="profile.html"><span class="bottom-icon">♙</span><small>Profile</small></a>
+</nav>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="app.js"></script>
 </body></html>
