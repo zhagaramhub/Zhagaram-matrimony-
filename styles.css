@@ -174,3 +174,7 @@ footer{background:var(--zh-emerald-dark);border-top:2px solid var(--zh-champagne
   .section{padding-top:68px;padding-bottom:68px}
   .search-panel{box-shadow:0 10px 28px rgba(27,52,42,.07)}
 }
+
+/* Compact language control and respect hidden navigation items */
+.language-btn{padding:6px 9px!important;min-height:30px;border:1px solid #e8dfcf!important;border-radius:7px;background:#fffdf8!important;font-size:11px!important;line-height:1.1;letter-spacing:.1px}
+[hidden]{display:none!important}
