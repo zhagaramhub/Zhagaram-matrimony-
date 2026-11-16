@@ -89,6 +89,35 @@
         <p class="auth-message" id="authMessage" role="status" aria-live="polite">பதிவுக்கு Email சரிபார்ப்பு தேவைப்படலாம்.</p>
       </div>
     </section>
+    <section class="member-dashboard" id="memberDashboard" hidden>
+      <aside class="member-sidebar">
+        <div class="member-welcome"><span class="member-avatar" id="memberInitial">Z</span><b id="memberName">Member</b><small id="memberId">Zhagaram Member</small></div>
+        <button class="dash-link active" data-view="overview">▦ <span>Dashboard</span></button>
+        <button class="dash-link" data-view="profile">♙ <span>My Profile</span></button>
+        <button class="dash-link" data-view="matches">⌕ <span>Matches</span></button>
+        <button class="dash-link" data-view="interests">♡ <span>Interests</span></button>
+        <button class="dash-link" data-view="messages">✉ <span>Messages</span></button>
+        <button class="dash-link" data-view="preferences">⚙ <span>Partner Preference</span></button>
+        <button class="dash-link" id="dashboardLogout">↪ <span>Logout</span></button>
+      </aside>
+      <div class="dashboard-content">
+        <div class="dashboard-top"><div><span class="section-kicker">MEMBER AREA</span><h2 id="dashboardHeading">வணக்கம்!</h2><p>உங்கள் திருமணத் தேடலை இங்கிருந்து தொடருங்கள்.</p></div><span class="free-chip">FREE MEMBER</span></div>
+        <div class="dashboard-view" id="overviewView">
+          <div class="dashboard-cards">
+            <article class="dash-stat"><span>Profile Status</span><b id="dashStatus">Pending Review</b><small>நிர்வாகச் சரிபார்ப்பு</small></article>
+            <article class="dash-stat"><span>Profile Completion</span><b>Basic Profile</b><small>மேலும் விவரங்களை விரைவில் சேர்க்கலாம்</small></article>
+            <article class="dash-stat"><span>Membership</span><b>Free</b><small>Basic membership</small></article>
+          </div>
+          <div class="dash-panel"><h3>அடுத்ததாக செய்ய வேண்டியவை</h3><div class="dash-actions"><button class="dash-action" data-view="profile">My Profile விவரங்களைப் பார்க்கவும் →</button><button class="dash-action" data-view="preferences">Partner Preference அமைக்கவும் →</button><button class="dash-action" data-view="matches">பொருத்தங்களைப் பார்க்கவும் →</button></div></div>
+          <p class="privacy-note">Matches, interests மற்றும் messages வசதிகள் அடுத்த கட்டத்தில் உண்மையான உறுப்பினர் தரவுடன் இணைக்கப்படும்.</p>
+        </div>
+        <div class="dashboard-view" id="profileView" hidden><div class="dash-panel"><h3>My Profile</h3><div class="profile-detail-grid" id="profileDetails"></div><button class="btn btn-outline" id="editProfileButton" type="button">Profile விவரங்களைத் திருத்து</button></div></div>
+        <div class="dashboard-view" id="matchesView" hidden><div class="dash-panel"><h3>பொருத்தமான Profiles</h3><p>உண்மையான உறுப்பினர் Profiles இணைக்கப்பட்டதும் இங்கே காட்டப்படும். இப்போது உள்ள மாதிரி Profiles உண்மையான உறுப்பினர்கள் அல்ல.</p></div></div>
+        <div class="dashboard-view" id="interestsView" hidden><div class="dash-panel"><h3>Interests & Shortlist</h3><p>உங்கள் விருப்பப் பட்டியல் மற்றும் அனுப்பிய Interests இங்கே கிடைக்கும்.</p></div></div>
+        <div class="dashboard-view" id="messagesView" hidden><div class="dash-panel"><h3>Messages</h3><p>தனியுரிமை பாதுகாக்கப்பட்ட உறுப்பினர் செய்திகள் அடுத்த கட்டத்தில் இணைக்கப்படும்.</p></div></div>
+        <div class="dashboard-view" id="preferencesView" hidden><div class="dash-panel"><h3>Partner Preference</h3><p>வயது, இடம், கல்வி மற்றும் பிற விருப்பங்களை அமைக்கும் வசதி அடுத்த கட்டத்தில் சேர்க்கப்படும்.</p></div></div>
+      </div>
+    </section>
     <section class="profile-create" id="createProfile" hidden>
       <div class="auth-intro"><span class="section-kicker">உங்கள் விவரங்கள்</span><h2>திருமண Profile உருவாக்குங்கள்</h2><p>உங்கள் அடிப்படை விவரங்களை நிரப்புங்கள். Profile முதலில் சரிபார்ப்புக்காக Pending நிலையில் இருக்கும்.</p></div>
       <form id="profileForm" class="profile-form">
