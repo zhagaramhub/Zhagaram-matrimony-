@@ -1,45 +1,35 @@
-/* Zhagaram member dashboard refresh — warm ivory, forest green and muted gold */
-:root{--zd-forest:#153d32;--zd-deep:#0e2d26;--zd-gold:#b99a58;--zd-ivory:#fbf8f0;--zd-line:#e9e2d4;--zd-muted:#7b8179}
-body:has(.dashboard-page){background:var(--zd-ivory)}
-.dashboard-page{width:min(1240px,94%);grid-template-columns:248px minmax(0,1fr);gap:24px;margin:28px auto 72px}
-.member-sidebar{background:linear-gradient(160deg,var(--zd-forest),var(--zd-deep));border:1px solid #234b40;border-radius:20px;padding:20px 14px;box-shadow:0 18px 40px #102f2618}
-.member-welcome{padding:12px 8px 20px;margin-bottom:14px}
-.member-avatar{background:linear-gradient(145deg,#f1dfb5,#c4a56b);color:#18392f}
-.member-welcome b{font-size:14px}
-.member-welcome small{font-size:10px}
-.dash-link{min-height:45px;padding:10px 12px;border-radius:10px;font-size:12px;transition:background .18s ease,color .18s ease}
-.dash-link.active,.dash-link:hover{background:#ffffff18;color:#f3dca7}
-.dashboard-content{min-width:0}
-.dashboard-top{margin:4px 0 8px;align-items:flex-start}
-.dashboard-top h2{font-size:clamp(25px,3vw,34px);letter-spacing:-.4px}
-.dashboard-intro{margin:0 0 20px;color:#777d74;font-size:12px}
-.free-chip{background:#f2ead8;color:#806536;border-color:#e3d4ad}
-.dash-overview{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(220px,.8fr);gap:14px;margin-bottom:16px}
-.dash-welcome-card,.dash-status-card,.dash-panel,.dash-stat{background:#fff;border:1px solid var(--zd-line);border-radius:17px;box-shadow:0 9px 28px #263d3009}
-.dash-welcome-card{padding:22px 23px;background:linear-gradient(120deg,#fff 0%,#f7f1e4 100%);position:relative;overflow:hidden}
-.dash-welcome-card:after{content:"ழ";position:absolute;right:18px;bottom:-30px;font:120px Georgia,serif;color:#b99a5812;pointer-events:none}
-.dash-eyebrow{font-size:9px;font-weight:800;letter-spacing:1.2px;color:#927746}
-.dash-welcome-card h3{font:700 22px "Noto Serif Tamil",serif;color:var(--zd-forest);margin:10px 0 7px}
-.dash-welcome-card p{font-size:11px;line-height:1.8;color:#73786f;max-width:460px;margin:0 0 15px}
-.dash-primary-link{display:inline-flex;align-items:center;gap:9px;padding:10px 14px;border-radius:9px;background:var(--zd-forest);color:#fff;font-size:11px;font-weight:700}
-.dash-primary-link:hover{background:var(--zd-deep)}
-.dash-status-card{padding:19px;display:flex;flex-direction:column;justify-content:center}
-.dash-status-card>span{font-size:9px;font-weight:800;letter-spacing:1px;color:#8c806d}
-.dash-status-card strong{font:700 20px "Noto Serif Tamil",serif;color:var(--zd-forest);margin:10px 0 4px;overflow-wrap:anywhere}
-.dash-status-card small{font-size:10px;line-height:1.7;color:#85877f}
-.dashboard-cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.dash-stat{min-height:0;padding:17px}
-.dash-stat>span{font-size:9px}
-.dash-stat>b{font-size:18px;margin:8px 0 3px}
-.dash-stat>small{font-size:10px}
-.dash-stat>a{font-size:10px;margin-top:10px}
-.dash-panel{padding:20px;margin-top:16px}
-.dash-panel h3{font-size:17px}
-.dash-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.dash-action{min-height:62px;padding:13px;border-color:#eee8dc;background:#fffefa;font-size:11px;line-height:1.5}
-.dash-action b{color:#a88a4e;font-size:17px}
-.dash-action.disabled{opacity:.72}
-.dash-action small{font-size:9px}
-.dashboard-note{padding:11px 13px;background:#f8f5ed;border:1px solid #eee7d8;border-radius:10px;font-size:10px}
-@media(max-width:900px){.dashboard-page{grid-template-columns:1fr;gap:15px}.member-sidebar{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}.member-welcome{grid-column:1/-1;display:flex;justify-content:flex-start;text-align:left;gap:12px}.dash-overview{grid-template-columns:1fr 1fr}}
-@media(max-width:600px){.dashboard-page{width:93%;margin:18px auto 48px}.member-sidebar{grid-template-columns:1fr 1fr;padding:12px}.member-welcome{grid-column:1/-1}.dash-link{font-size:11px;min-height:44px}.dashboard-top{align-items:flex-start}.dashboard-cards{grid-template-columns:1fr}.dash-overview{grid-template-columns:1fr}.dash-welcome-card{padding:19px}.dash-welcome-card h3{font-size:19px}.dash-actions{grid-template-columns:1fr}.dash-panel{padding:16px}.free-chip{font-size:8px}}
+/* Clean member app layout: soft pale palette and fixed icon navigation */
+:root{--zd-bg:#f7f5ef;--zd-paper:#fffefa;--zd-ink:#29483d;--zd-muted:#85877e;--zd-line:#ebe6db;--zd-gold:#b49a6a;--zd-soft:#f1ecdf}
+body.member-home{margin:0;background:var(--zd-bg);color:var(--zd-ink);font-family:"DM Sans","Noto Sans Tamil",sans-serif;padding-bottom:94px}
+.member-header{height:68px;padding:0 5%;background:#fffefa;border-bottom:1px solid var(--zd-line);position:sticky;top:0}
+.member-header .brand{color:var(--zd-ink)}.member-header .brand-mark{background:#e9e2d2;color:var(--zd-ink);border-radius:13px}
+.member-header nav,.member-header .menu-toggle{display:none!important}
+.dash-logout{border:0;background:#f1eee6;color:#647469;border-radius:50%;width:38px;height:38px;font-size:20px;cursor:pointer}
+.member-main{width:min(760px,92%);margin:26px auto 30px}
+.member-greeting{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:8px 0 18px}
+.member-greeting .section-kicker{font-size:9px;letter-spacing:1.4px;color:#a38a5d}
+.member-greeting h1{font:700 clamp(23px,5vw,31px) "Noto Serif Tamil",serif;letter-spacing:0;line-height:1.45;color:var(--zd-ink);margin:7px 0 3px}
+.member-greeting p{font-size:11px;color:var(--zd-muted);margin:0;line-height:1.7}
+.member-avatar-large{width:58px;height:58px;flex:0 0 58px;border-radius:50%;display:grid;place-items:center;background:#e9e1d0;border:2px solid #fff;color:#526c5d;font:700 24px "Noto Sans Tamil",sans-serif;box-shadow:0 4px 14px #334b3c12}
+.member-id-strip{display:flex;align-items:center;gap:9px;flex-wrap:wrap;padding:12px 15px;background:#f0ede4;border:1px solid #e8e2d5;border-radius:12px;margin-bottom:15px}
+.member-id-strip span{font-size:10px;color:#88877d}.member-id-strip strong{font-size:11px;color:#596c5d;letter-spacing:.5px}.member-id-strip .member-id-name{margin-left:auto;font-weight:700;color:#68776b}
+.member-profile-card{background:var(--zd-paper);border:1px solid var(--zd-line);border-radius:18px;padding:20px;box-shadow:0 8px 24px #344b3b0a}
+.profile-card-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.soft-kicker{font-size:9px;font-weight:800;letter-spacing:1.4px;color:#aa9162}
+.profile-card-top h2{font:700 20px "Noto Serif Tamil",serif;color:var(--zd-ink);margin:7px 0 4px}
+.profile-card-top p{font-size:11px;color:var(--zd-muted);margin:0;line-height:1.7}
+.profile-symbol{width:42px;height:42px;border-radius:13px;background:#f1eee5;color:#8e805f;display:grid;place-items:center;font-size:22px}
+.profile-status-line{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid #f0ece3;border-bottom:1px solid #f0ece3;margin:18px 0 14px;padding:13px 0}
+.profile-status-line span{font-size:11px;color:#88877d}.profile-status-line strong{font-size:11px;color:#92794d}
+.edit-profile-button{display:flex;align-items:center;gap:10px;padding:13px 15px;border-radius:11px;background:#e9eee8;color:#496353;font-size:12px;font-weight:700}
+.edit-profile-button>span{font-size:17px}.edit-profile-button b{margin-left:auto;color:#8c9a8c;font-size:17px}
+.member-privacy-note{display:flex;align-items:flex-start;gap:10px;margin:14px 2px;color:#929187}
+.member-privacy-note>span{font-size:17px;color:#ad9b75}
+.member-privacy-note p{font-size:10px;line-height:1.8;margin:0}
+.member-bottom-nav{position:fixed;z-index:30;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:2px;padding:9px 5px max(9px,env(safe-area-inset-bottom));background:#fffefa;border-top:1px solid #eae5da;box-shadow:0 -7px 24px #344b3b0b}
+.bottom-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;padding:4px 1px;color:#96968c;text-decoration:none;border-radius:10px}
+.bottom-icon{width:29px;height:27px;display:grid;place-items:center;font-size:21px;line-height:1}
+.bottom-nav-item small{font:600 9px "DM Sans",sans-serif;white-space:nowrap}
+.bottom-nav-item.active{color:#58715f}.bottom-nav-item.active .bottom-icon{background:#edf0e8;border-radius:9px;width:34px}
+.bottom-nav-item:hover{color:#6d806e}
+@media(min-width:760px){.member-main{margin-top:38px}.member-greeting{margin-bottom:22px}.member-profile-card{padding:25px}.member-bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(760px,92%);bottom:16px;border:1px solid #eae5da;border-radius:18px;padding:8px;box-shadow:0 8px 30px #344b3b18}}
