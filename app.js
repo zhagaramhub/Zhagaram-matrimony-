@@ -127,6 +127,17 @@ Object.assign(zhTranslations,{
 "நிர்வாக அனுமதி தேவை.":"Administrator access required.",
 "ZHAGARAM MEMBER ID":"ZHAGARAM MEMBER ID",
 "Owner Panel":"உரிமையாளர் பகுதி",
+"OWNER CONTROL CENTER":"உரிமையாளர் கட்டுப்பாட்டு மையம்",
+"TEAM ACCESS":"குழு அணுகல்",
+"TASK MANAGEMENT":"பணி நிர்வாகம்",
+"MY TASKS":"எனது பணிகள்",
+"STAFF WORKSPACE":"பணியாளர் பணியிடம்",
+"OWNER ACCESS":"உரிமையாளர் அனுமதி",
+"STAFF ACCESS":"பணியாளர் அனுமதி",
+"மொத்த உறுப்பினர்கள்":"Total members",
+"சரிபார்ப்பு நிலுவை":"Pending review",
+"அங்கீகரிக்கப்பட்டவை":"Approved",
+"நிராகரிப்பு / நிறுத்தம்":"Rejected / Suspended",
 "Staff CRM":"பணியாளர் CRM",
 "Admin CRM":"நிர்வாக CRM"
 });
