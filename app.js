@@ -151,7 +151,7 @@ Object.assign(zhTranslations,{
 });
 const zhEnglishToTamil = Object.fromEntries(Object.entries(zhTranslations).filter(([source])=>!/[அ-ஹ]/.test(source)).map(([en,ta])=>[en,ta]));
 const zhTamilToEnglish = Object.fromEntries(Object.entries(zhTranslations).filter(([source])=>/[அ-ஹ]/.test(source)).map(([ta,en])=>[ta,en]));
-let zhLanguage = localStorage.getItem("zhagaram-language") || "en";
+let zhLanguage = localStorage.getItem("zhagaram-language-v2") || "en";
 const zhTranslate = value => {
   const key = String(value ?? "").trim();
   const dict = zhLanguage === "en" ? zhTamilToEnglish : zhEnglishToTamil;
@@ -176,7 +176,7 @@ function zhApplyLanguage(){
   if(switcher){const label=zhLanguage==="ta"?"English":"தமிழ்";if(switcher.textContent!==label)switcher.textContent=label;}
 }
 function zhSetLanguage(next){
-  zhLanguage=next;localStorage.setItem("zhagaram-language",next);zhApplyLanguage();
+  zhLanguage=next;localStorage.setItem("zhagaram-language-v2",next);zhApplyLanguage();
 }
 function zhInstallLanguageSwitch(){
   const header=document.querySelector(".site-header");
