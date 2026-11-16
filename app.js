@@ -232,9 +232,9 @@ if (adminPage) {
     const {data:{user},error:userError} = await supabase.auth.getUser();
     if (userError) throw userError;
     if (!user) { location.href = "login.html"; return null; }
-    const {data:roles,error:roleError} = await supabase.from("user_roles").select("role").eq("user_id",user.id).eq("role","admin");
+    const {data:roles,error:roleError} = await supabase.from("user_roles").select("role").eq("user_id",user.id);
     if (roleError) throw roleError;
-    if (!roles || !roles.some(row => row.role === "admin")) {
+    if (!roles || !roles.some(row => ["admin","owner"].includes(row.role))) {
       showAdminMessage("இந்தப் பக்கத்தைப் பார்க்க நிர்வாக அனுமதி தேவை.", "error");
       setTimeout(() => { location.href = "dashboard.html"; }, 1800);
       return null;
