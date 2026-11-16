@@ -33,3 +33,67 @@ footer{background:#0b203d}
 .dash-stat a{display:inline-block;font-size:11px;color:#98712d;margin-top:8px;font-weight:700}
 .dash-action{display:block;text-decoration:none}
 @media(max-width:650px){.page-hero{padding:45px 7vw 28px}.page-search{margin-top:0}.membership-page{margin-top:0}.profile-page{padding-top:30px}}
+
+
+/* Zhagaram premium editorial identity — ivory, deep emerald and champagne */
+:root{--ink:#183b35;--ink-deep:#102b27;--gold:#b5965a;--gold-light:#e8d9b7;--ivory:#faf8f2;--paper:#fffefa;--muted:#777d73;--line:#e9e3d6}
+body{background:var(--paper);color:#293b35;font-family:"DM Sans","Noto Sans Tamil",sans-serif}
+.site-header{height:86px;background:rgba(255,254,250,.97);border-bottom:1px solid var(--line);box-shadow:0 5px 22px #1a342b08}
+.brand{color:var(--ink)}.brand-mark{background:linear-gradient(145deg,#244b42,#102b27);border-radius:50%;box-shadow:0 5px 15px #183b3528;color:#f5e8c9}
+.brand b{font-family:"Noto Serif Tamil",Georgia,serif;letter-spacing:.2px}
+.site-header nav{gap:30px;color:#46564f}
+.site-header nav>a:not(.btn):hover,.text-link:hover{color:var(--gold)}
+.language-btn,.nav-login{color:var(--ink)}
+.btn{border-radius:3px;letter-spacing:.25px}
+.btn-primary{background:linear-gradient(120deg,#244b42,#102b27);box-shadow:0 8px 22px #183b3526}
+.btn-primary:hover{background:#0d2924}
+.hero{background:radial-gradient(ellipse at 82% 40%,#eee6d4 0,transparent 38%),linear-gradient(110deg,#faf8f2,#fffefa);min-height:600px}
+.eyebrow{background:#f0eadc;color:#8d7445;border:1px solid #e5dac1;border-radius:2px}
+.eyebrow-dot{background:var(--gold)}
+h1,.section h2,.membership h2,.final-cta h2,.page-hero h1,.auth-intro h2{font-family:"Noto Serif Tamil",Georgia,serif;font-weight:600;letter-spacing:-.5px}
+.poetry-heading{color:var(--ink)!important;font-family:"Noto Serif Tamil",Georgia,serif!important}
+.poetry-heading em,h1 em,h2 em{color:#a8894e}
+.hero-copy,.section-intro p,.page-hero p{color:#737b72}
+.hero-art .sun-shape{background:#eee6d4;border:1px solid #e5dcc9}
+.card-main{border-radius:4px;box-shadow:0 25px 65px #1c35251c;border:1px solid #eee8dc}
+.photo-placeholder{border-radius:2px;background:linear-gradient(145deg,#c6c9b8,#e7dfcc 58%,#b4b9a7)}
+.match-tag{border-radius:2px;color:var(--ink);box-shadow:0 8px 25px #1b33241c}
+.floating-note{border:1px solid var(--line);border-radius:3px;box-shadow:0 12px 32px #1b332412}
+.note-icon,.step-icon{background:#f0eadc;color:#a8894e;border-radius:3px}
+.search-panel,.auth-card,.profile-form,.membership-box{border:1px solid var(--line);border-radius:4px;box-shadow:0 18px 45px #20362b0d}
+.search-grid select,.auth-form input,.profile-form input,.profile-form select{border-color:#e5e1d6;border-radius:3px;background:#fffefa}
+.search-grid select:focus,.auth-form input:focus,.profile-form input:focus,.profile-form select:focus{outline:1px solid #b5965a;border-color:#b5965a}
+.section{background:#fffefa}
+.profiles-section,.profile-create{background:#f5f3ec}
+.step,.profile-card,.dash-stat,.dash-panel,.member-sidebar{border:1px solid var(--line);border-radius:4px;box-shadow:0 10px 30px #20362b08}
+.step{background:#fffefa}
+.profile-card{overflow:hidden}
+.profile-visual{background-color:#e7e4d8}
+.visual-a{background:linear-gradient(135deg,#b8c4b6,#e7deca)}
+.visual-b{background:linear-gradient(135deg,#c5bba3,#e9e1d2)}
+.visual-c{background:linear-gradient(135deg,#b7c0b5,#ddd6c4)}
+.profile-visual i{color:var(--gold);border-radius:2px}
+.profile-id,.dash-stat a{color:#9b804c}
+.sample-pill{background:#eee8d9;color:#8c7446;border-radius:2px}
+.membership{background:linear-gradient(115deg,#173b34,#102b27);border-top:1px solid #b5965a}
+.membership p{color:#d6ded5}
+.membership-box{background:#fffefa;color:#293b35}
+.membership-row b,.dash-stat b,.dash-link.active,.dash-link:hover,.dash-action,.btn-outline,.auth-tab.active{color:var(--ink)}
+.btn-light{background:#e8dcc0;color:#203c34;border-radius:3px}
+.final-cta{background:#f7f4eb}
+.cta-symbol{background:#eee7d8;color:#927847;border-radius:50%}
+footer{background:#102b27;border-top:2px solid #b5965a}
+.auth-section,.profile-create{background:#f7f5ee}
+.auth-card,.profile-form{background:#fffefa}
+.auth-tab.active{border-bottom-color:var(--gold)}
+.btn-outline{border-color:#d9cfb9;border-radius:3px}
+.member-dashboard{background:#f5f3ec}
+.member-sidebar,.dash-stat,.dash-panel{background:#fffefa}
+.member-avatar{background:linear-gradient(145deg,#244b42,#102b27)}
+.dash-link.active,.dash-link:hover{background:#f0eadc}
+.dash-action{background:#faf8f2;border-color:var(--line)}
+.free-chip{background:#eee8d9;color:#826b3f;border-radius:2px}
+.page-hero{background:linear-gradient(110deg,#f7f5ee,#fffefa);border-bottom:1px solid var(--line)}
+.page-hero h1{color:var(--ink)}
+.toast{border-radius:3px;background:#183b35}
+@media(max-width:650px){.site-header{height:74px}.site-header nav{background:#fffefa}.hero{min-height:0}.hero h1{letter-spacing:-.3px}.section{padding-top:68px;padding-bottom:68px}}
