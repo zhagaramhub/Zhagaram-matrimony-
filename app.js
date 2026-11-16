@@ -1,54 +1,22 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+const SUPABASE_URL = "https://gpyufzuuvupkvyrvuixw.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_JLyb6hy1OcMacRYzPK2gWw_aPMNbcJW";
+const supabase = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 const $ = (id) => document.getElementById(id);
-const toast = (message) => {
-  const el = $("toast");
-  el.textContent = message;
-  el.classList.add("show");
-  window.clearTimeout(window.__toastTimer);
-  window.__toastTimer = window.setTimeout(() => el.classList.remove("show"), 2800);
-};
-$("year").textContent = new Date().getFullYear();
-$("menuToggle").addEventListener("click", () => $("mainNav").classList.toggle("open"));
-document.querySelectorAll("#mainNav a").forEach(link => link.addEventListener("click", () => $("mainNav").classList.remove("open")));
-
-$("searchForm").addEventListener("submit", (event) => {
-  event.preventDefault();
-  const gender = $("lookingFor").value;
-  const age = $("ageRange").value;
-  const religion = $("religion").value;
-  let visible = 0;
-  document.querySelectorAll(".profile-card").forEach(card => {
-    const cardAge = Number(card.dataset.age);
-    const ageMatch = age === "all" || (age === "20-25" && cardAge >= 20 && cardAge <= 25) || (age === "26-30" && cardAge >= 26 && cardAge <= 30) || (age === "31-35" && cardAge >= 31 && cardAge <= 35);
-    const genderMatch = gender === "all" || card.dataset.gender === gender;
-    const religionMatch = religion === "all" || card.dataset.religion === religion;
-    const show = ageMatch && genderMatch && religionMatch;
-    card.hidden = !show;
-    if (show) visible++;
-  });
-  $("emptyState").hidden = visible !== 0;
-  $("profiles").scrollIntoView({behavior:"smooth"});
-  toast(visible ? visible + " sample profile(s) found" : "பொருத்தமான மாதிரி Profile இல்லை");
-});
-
-document.querySelectorAll(".profile-visual i").forEach(button => {
-  button.setAttribute("role","button");
-  button.setAttribute("tabindex","0");
-  button.setAttribute("aria-label","Save sample profile");
-  const toggle = () => {
-    button.classList.toggle("saved");
-    button.textContent = button.classList.contains("saved") ? "♥" : "♡";
-    toast("இது மாதிரி Profile மட்டுமே. உண்மையான சேமிப்பு Login வசதிக்குப் பிறகு.");
-  };
-  button.addEventListener("click",toggle);
-  button.addEventListener("keydown",event=>{if(event.key==="Enter"||event.key===" "){event.preventDefault();toggle();}});
-});
-
-$("languageToggle").addEventListener("click", () => {
-  toast("English content will be enabled in the next language update.");
-});
-document.querySelectorAll('a[href="#login"], a[href="#register"]').forEach(link => {
-  link.addEventListener("click",event=>{
-    event.preventDefault();
-    toast("Login / Registration வசதி Supabase இணைப்புக்குப் பிறகு செயல்படுத்தப்படும்.");
-  });
-});
+const message = (text, isError=false) => { const el=$("authMessage"); el.textContent=text; el.classList.toggle("error",isError); };
+const toast = (text) => { const el=$("toast"); el.textContent=text; el.classList.add("show"); window.clearTimeout(window.__toastTimer); window.__toastTimer=window.setTimeout(()=>el.classList.remove("show"),3000); };
+$("year").textContent=new Date().getFullYear();
+$("menuToggle").addEventListener("click",()=>$("mainNav").classList.toggle("open"));
+document.querySelectorAll("#mainNav a").forEach(a=>a.addEventListener("click",()=>$("mainNav").classList.remove("open")));
+$("searchForm").addEventListener("submit",event=>{event.preventDefault();const g=$("lookingFor").value,a=$("ageRange").value,r=$("religion").value;let n=0;document.querySelectorAll(".profile-card").forEach(card=>{const age=Number(card.dataset.age);const am=a==="all"||(a==="20-25"&&age>=20&&age<=25)||(a==="26-30"&&age>=26&&age<=30)||(a==="31-35"&&age>=31&&age<=35);const show=am&&(g==="all"||card.dataset.gender===g)&&(r==="all"||card.dataset.religion===r);card.hidden=!show;if(show)n++;});$("emptyState").hidden=n!==0;$("profiles").scrollIntoView({behavior:"smooth"});toast(n?n+" sample profile(s) found":"பொருத்தமான மாதிரி Profile இல்லை");});
+document.querySelectorAll(".profile-visual i").forEach(el=>{el.setAttribute("role","button");el.setAttribute("tabindex","0");const toggle=()=>{el.classList.toggle("saved");el.textContent=el.classList.contains("saved")?"♥":"♡";toast("இது மாதிரி Profile மட்டுமே.");};el.addEventListener("click",toggle);el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggle();}});});
+$("languageToggle").addEventListener("click",()=>toast("English interface update விரைவில்."));
+function setTab(register){$("registerForm").hidden=!register;$("loginForm").hidden=register;$("showRegister").classList.toggle("active",register);$("showLogin").classList.toggle("active",!register);message(register?"புதிய Email கணக்கை உருவாக்குங்கள்.":"உங்கள் Email மற்றும் Password மூலம் உள்நுழையுங்கள்.");}
+$("showRegister").addEventListener("click",()=>setTab(true));$("showLogin").addEventListener("click",()=>setTab(false));
+$("registerForm").addEventListener("submit",async e=>{e.preventDefault();const email=$("regEmail").value.trim(),password=$("regPassword").value;if(password.length<8){message("கடவுச்சொல் குறைந்தது 8 எழுத்துகள் இருக்க வேண்டும்.",true);return;}const btn=e.submitter;btn.disabled=true;message("பதிவு செய்கிறது...");try{const {data,error}=await supabase.auth.signUp({email,password});if(error)throw error;if(data.session){message("கணக்கு உருவானது. இப்போது உங்கள் Profile விவரங்களை நிரப்புங்கள்.");await refreshSession(data.session.user);}else{message("பதிவு கோரிக்கை வெற்றி. உங்கள் Email-க்கு வந்த verification link-ஐ திறந்து, பின்னர் Login செய்யுங்கள்.");}}catch(err){message(err.message||"பதிவு செய்ய முடியவில்லை.",true);}finally{btn.disabled=false;}});
+$("loginForm").addEventListener("submit",async e=>{e.preventDefault();const btn=e.submitter;btn.disabled=true;message("உள்நுழைகிறது...");try{const {data,error}=await supabase.auth.signInWithPassword({email:$("loginEmail").value.trim(),password:$("loginPassword").value});if(error)throw error;await refreshSession(data.user);message("வெற்றிகரமாக உள்நுழைந்துள்ளீர்கள்.");}catch(err){message(err.message||"Login தோல்வியடைந்தது.",true);}finally{btn.disabled=false;}});
+async function refreshSession(user){const activeUser=user||(await supabase.auth.getUser()).data.user;if(!activeUser){$("sessionBar").hidden=true;$("createProfile").hidden=true;return;}$("sessionBar").hidden=false;$("sessionEmail").textContent=activeUser.email||"Logged in";const {data,error}=await supabase.from("profiles").select("id").eq("id",activeUser.id).maybeSingle();if(error){message("உள்நுழைந்துள்ளீர்கள். Profile நிலையைப் பெற முடியவில்லை: "+error.message,true);return;}$("createProfile").hidden=!!data;if(data)message("உங்கள் Profile ஏற்கனவே சேமிக்கப்பட்டுள்ளது.");}
+$("logoutButton").addEventListener("click",async()=>{const {error}=await supabase.auth.signOut();if(error){message(error.message,true);return;}await refreshSession(null);message("வெற்றிகரமாக Logout செய்துள்ளீர்கள்.");});
+$("profileForm").addEventListener("submit",async e=>{e.preventDefault();const btn=e.submitter;btn.disabled=true;message("Profile சேமிக்கிறது...");try{const {data:{user},error:userError}=await supabase.auth.getUser();if(userError||!user)throw new Error("முதலில் Login செய்யுங்கள்.");const profile={id:user.id,full_name:$("fullName").value.trim(),date_of_birth:$("dateOfBirth").value,gender:$("gender").value,religion:$("profileReligion").value.trim()||null,community:$("community").value.trim()||null,education:$("education").value.trim()||null,occupation:$("occupation").value.trim()||null,city:$("city").value.trim()||null,profile_status:"pending"};const {error}=await supabase.from("profiles").upsert(profile,{onConflict:"id"});if(error)throw error;const {error:privateError}=await supabase.from("profile_private").upsert({user_id:user.id,mobile_number:$("mobile").value.trim()},{onConflict:"user_id"});if(privateError)throw privateError;$("createProfile").hidden=true;message("Profile சேமிக்கப்பட்டது. நிர்வாகச் சரிபார்ப்புக்குப் பிறகு செயல்படுத்தப்படும்.");toast("Profile வெற்றிகரமாக சேமிக்கப்பட்டது.");}catch(err){message(err.message||"Profile சேமிக்க முடியவில்லை.",true);}finally{btn.disabled=false;}});
+const {data:{session}}=await supabase.auth.getSession();if(session)await refreshSession(session.user);
+supabase.auth.onAuthStateChange((_event,session)=>{if(session)refreshSession(session.user);else refreshSession(null);});
