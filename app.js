@@ -90,7 +90,7 @@ function zhApplyLanguage(){
   const walker = document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
   let node;
   while((node=walker.nextNode())){
-    if(!node.parentElement?.closest("script,style,input,textarea,select,option[data-value],.brand")) {
+    if(!node.parentElement?.closest("script,style,input,textarea,option[data-value],.brand")) {
       const before=node.nodeValue, after=zhTranslate(before);
       if(after!==before) node.nodeValue=after;
     }
