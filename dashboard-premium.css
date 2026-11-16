@@ -29,3 +29,10 @@
 .dashboard-note{font-size:10px;color:#948b7d;line-height:1.8;margin:14px 2px 0}
 @media(max-width:850px){.dashboard-page{grid-template-columns:1fr;gap:18px}.member-sidebar{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px;padding:15px}.member-welcome{grid-column:1/-1;display:flex;justify-content:flex-start;text-align:left;gap:12px;padding:5px 8px 15px}.member-avatar{width:48px;height:48px;font-size:22px;flex:0 0 auto}.member-welcome b{margin-top:2px}.member-welcome small{display:block}.dash-link{margin:0}}
 @media(max-width:560px){.dashboard-page{width:92%;margin:22px auto 55px}.member-sidebar{grid-template-columns:1fr 1fr}.member-welcome{grid-column:1/-1}.dashboard-top{align-items:flex-start}.dashboard-cards{grid-template-columns:1fr}.dash-stat{min-height:0;padding:17px}.dash-stat>b{font-size:19px;margin:8px 0 3px}.dash-actions{grid-template-columns:1fr}.dash-panel{padding:18px}.free-chip{font-size:8px;padding:8px 10px}}
+
+/* Mobile-first vertical member dashboard flow */
+.dashboard-cards{grid-template-columns:1fr;gap:12px}
+.dash-actions{grid-template-columns:1fr;gap:10px}
+.dash-stat{min-height:0;padding:17px 19px}
+.dash-panel{margin-top:15px}
+@media(max-width:850px){.member-sidebar{grid-template-columns:1fr!important}.member-welcome{grid-column:1/-1}.dash-link{width:100%}}
