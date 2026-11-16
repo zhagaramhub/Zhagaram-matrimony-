@@ -151,7 +151,7 @@ Object.assign(zhTranslations,{
 });
 const zhEnglishToTamil = Object.fromEntries(Object.entries(zhTranslations).filter(([source])=>!/[அ-ஹ]/.test(source)).map(([en,ta])=>[en,ta]));
 const zhTamilToEnglish = Object.fromEntries(Object.entries(zhTranslations).filter(([source])=>/[அ-ஹ]/.test(source)).map(([ta,en])=>[ta,en]));
-let zhLanguage = localStorage.getItem("zhagaram-language") || "ta";
+let zhLanguage = localStorage.getItem("zhagaram-language") || "en";
 const zhTranslate = value => {
   const key = String(value ?? "").trim();
   const dict = zhLanguage === "en" ? zhTamilToEnglish : zhEnglishToTamil;
@@ -162,7 +162,7 @@ function zhApplyLanguage(){
   const walker = document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
   let node;
   while((node=walker.nextNode())){
-    if(!node.parentElement?.closest("script,style,input,textarea,option[data-value],.brand")) {
+    if(!node.parentElement?.closest("script,style,input,textarea,option[data-value],.brand,.poetry-heading")) {
       const before=node.nodeValue, after=zhTranslate(before);
       if(after!==before) node.nodeValue=after;
     }
