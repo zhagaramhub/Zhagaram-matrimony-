@@ -1,0 +1,36 @@
+/* Zhagaram secure admin dashboard */
+.admin-shell{width:min(1240px,94%);margin:42px auto 76px}
+.admin-heading{display:flex;align-items:center;justify-content:space-between;gap:22px;margin-bottom:25px}
+.admin-heading h1{font:700 clamp(26px,4vw,38px) "Noto Serif Tamil",serif;color:#173b31;margin:9px 0}
+.admin-heading p{color:#81776a;font-size:13px;margin:0}
+.admin-user{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid #eee8d9;padding:11px 16px;border-radius:14px;box-shadow:0 8px 25px #263d3009}
+.admin-avatar{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#e9d7a7,#c9a65b);color:#17382f;font:800 22px "Noto Serif Tamil",serif}
+.admin-user b,.admin-user small{display:block}.admin-user b{font-size:12px;color:#173b31}.admin-user small{font-size:10px;color:#928675;margin-top:3px}
+.admin-alert{padding:12px 15px;border-radius:10px;background:#f5f1e6;color:#6e5c32;font-size:12px;margin:0 0 18px}
+.admin-alert.error{background:#fff0ed;color:#a43f32}.admin-alert.success{background:#edf7ef;color:#28613b}
+.admin-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:20px}
+.admin-stats article{background:#fff;border:1px solid #eee8d9;border-radius:14px;padding:18px;box-shadow:0 8px 25px #263d3009}
+.admin-stats span{display:block;color:#82796d;font-size:11px;line-height:1.6}.admin-stats b{display:block;color:#173b31;font:700 28px "DM Sans",sans-serif;margin-top:8px}
+.admin-panel{background:#fff;border:1px solid #eee8d9;border-radius:16px;padding:22px;margin-top:18px;box-shadow:0 8px 25px #263d3009}
+.admin-panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:17px}
+.admin-panel-head h2{font:700 20px "Noto Serif Tamil",serif;color:#173b31;margin:6px 0 0}
+.admin-refresh{border:1px solid #d9cfb8;background:#fffdf8;color:#6d5b36;border-radius:9px;padding:9px 13px;font:700 11px "Noto Sans Tamil",sans-serif;cursor:pointer}
+.admin-filters{display:flex;gap:13px;align-items:end;margin-bottom:15px}
+.admin-filters label{display:grid;gap:6px;color:#776e61;font-size:11px;font-weight:700}
+.admin-filters input,.admin-filters select{min-height:42px;border:1px solid #e7e1d4;border-radius:9px;padding:9px 12px;background:#fff;color:#34483c;font:500 12px "Noto Sans Tamil",sans-serif;min-width:190px;outline-color:#b99b59}
+.admin-search{flex:1}.admin-search input{width:100%}
+.admin-table-wrap{overflow-x:auto;border:1px solid #eee8d9;border-radius:11px}
+.admin-table{width:100%;border-collapse:collapse;min-width:780px}
+.admin-table th{background:#f8f5ed;color:#766b58;font-size:10px;text-align:left;letter-spacing:.3px;padding:13px 14px;white-space:nowrap}
+.admin-table td{padding:14px;border-top:1px solid #f0ece3;color:#536156;font-size:11px;vertical-align:middle}
+.member-cell b,.member-cell small{display:block}.member-cell b{color:#173b31;font-size:12px}.member-cell small{color:#9a8e7d;font-size:10px;margin-top:4px}
+.status-pill{display:inline-flex;padding:6px 9px;border-radius:30px;font-size:10px;font-weight:800;white-space:nowrap;background:#f4efe2;color:#856a30}
+.status-pill.active{background:#eaf5ed;color:#2d7045}.status-pill.rejected{background:#fff0ed;color:#a44739}.status-pill.suspended{background:#eeeef0;color:#62616b}
+.action-group{display:flex;flex-wrap:wrap;gap:6px}
+.action-btn{border:0;border-radius:7px;padding:7px 9px;font:700 10px "Noto Sans Tamil",sans-serif;cursor:pointer;white-space:nowrap}
+.action-btn:disabled{opacity:.5;cursor:wait}.action-approve{background:#eaf5ed;color:#28613b}.action-reject{background:#fff0ed;color:#a44739}.action-suspend{background:#eeeef0;color:#62616b}.action-restore{background:#f4efe2;color:#856a30}
+.table-empty{padding:22px!important;text-align:center;color:#988d7d!important}
+.admin-footnote{font-size:10px;color:#948b7d;line-height:1.8;margin:13px 2px 0}
+.audit-list{display:grid;gap:0}.audit-item{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 2px;border-top:1px solid #f0ece3;font-size:11px;color:#687368}.audit-item:first-child{border-top:0}.audit-item b{color:#173b31}.audit-item small{display:block;color:#9a8e7d;margin-top:4px;font-size:10px}.audit-change{white-space:nowrap;color:#826b3d;font-weight:800}
+@media(max-width:760px){.admin-heading{align-items:flex-start;flex-direction:column}.admin-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-panel{padding:16px}.admin-filters{align-items:stretch;flex-direction:column}.admin-filters input,.admin-filters select{width:100%;min-width:0}.admin-panel-head h2{font-size:17px}}
+@media(max-width:420px){.admin-shell{margin:25px auto 55px}.admin-stats article{padding:14px}.admin-stats b{font-size:24px}.admin-user{width:100%}.audit-item{align-items:flex-start;flex-direction:column;gap:5px}}

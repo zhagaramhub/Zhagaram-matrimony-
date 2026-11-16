@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#123c32">
+<meta name="description" content="Zhagaram Matrimony பாதுகாப்பான நிர்வாகப் பகுதி.">
+<title>Admin Dashboard | Zhagaram Matrimony</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;500;600;700;800&family=Noto+Serif+Tamil:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<header class="site-header">
+<a class="brand" href="index.html"><span class="brand-mark">ழ</span><span><b>Zhagaram</b><small>MATRIMONY</small></span></a>
+<button class="menu-toggle" id="menuToggle" aria-label="Open menu">☰</button>
+<nav id="mainNav"><a href="index.html">Home</a><a href="dashboard.html">Member Dashboard</a><button class="btn btn-primary" id="adminLogout" type="button">Logout</button></nav>
+</header>
+<main class="admin-shell">
+<section class="admin-heading">
+<div><span class="section-kicker">பாதுகாப்பான நிர்வாகப் பகுதி · ADMIN ONLY</span><h1>உறுப்பினர் நிர்வாகம்</h1><p>சுயவிவரங்களைச் சரிபார்த்து, தகுந்த நிலையை வழங்குங்கள்.</p></div>
+<div class="admin-user"><span class="admin-avatar">ழ</span><span><b>Zhagaram Admin</b><small id="adminEmail">சரிபார்க்கப்படுகிறது...</small></span></div>
+</section>
+<div class="admin-alert" id="adminMessage" role="status" aria-live="polite">நிர்வாக அனுமதி சரிபார்க்கப்படுகிறது...</div>
+<section class="admin-stats" aria-label="Profile statistics">
+<article><span>மொத்த உறுப்பினர்கள்</span><b id="totalCount">—</b></article>
+<article><span>சரிபார்ப்புக்காக காத்திருப்பவை</span><b id="pendingCount">—</b></article>
+<article><span>அங்கீகரிக்கப்பட்டவை</span><b id="activeCount">—</b></article>
+<article><span>நிராகரிக்கப்பட்டவை / நிறுத்தப்பட்டவை</span><b id="otherCount">—</b></article>
+</section>
+<section class="admin-panel">
+<div class="admin-panel-head"><div><span class="section-kicker">MEMBER DIRECTORY</span><h2>உறுப்பினர் சுயவிவரங்கள்</h2></div><button class="admin-refresh" id="refreshMembers" type="button">↻ புதுப்பிக்க</button></div>
+<div class="admin-filters">
+<label class="admin-search">தேடல்<input id="memberSearch" type="search" placeholder="பெயர் / ஊர் / கல்வி"></label>
+<label>நிலை<select id="statusFilter"><option value="all">அனைத்தும்</option><option value="pending">சரிபார்க்கப்படாதவை</option><option value="active">அங்கீகரிக்கப்பட்டவை</option><option value="rejected">நிராகரிக்கப்பட்டவை</option><option value="suspended">நிறுத்தப்பட்டவை</option></select></label>
+</div>
+<div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>உறுப்பினர்</th><th>இடம்</th><th>கல்வி / பணி</th><th>நிலை</th><th>நிர்வாக நடவடிக்கை</th></tr></thead><tbody id="memberRows"><tr><td colspan="5" class="table-empty">தகவல்கள் ஏற்றப்படுகின்றன...</td></tr></tbody></table></div>
+<p class="admin-footnote">தனியுரிமைக்காக மொபைல் எண், தனிப்பட்ட மின்னஞ்சல் மற்றும் வருமான விவரங்கள் இங்கு காட்டப்படுவதில்லை.</p>
+</section>
+<section class="admin-panel audit-panel">
+<div class="admin-panel-head"><div><span class="section-kicker">ACTIVITY HISTORY</span><h2>சமீபத்திய நிர்வாக மாற்றங்கள்</h2></div><button class="admin-refresh" id="refreshAudit" type="button">↻ புதுப்பிக்க</button></div>
+<div class="audit-list" id="auditRows"><p class="table-empty">பதிவுகள் ஏற்றப்படுகின்றன...</p></div>
+</section>
+</main>
+<footer><a class="brand footer-brand" href="index.html"><span class="brand-mark">ழ</span><span><b>Zhagaram</b><small>MATRIMONY</small></span></a><p>Respect · Trust · Privacy</p><small>© <span id="year"></span> Zhagaram Matrimony. All rights reserved.</small></footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="app.js"></script>
+</body>
+</html>
