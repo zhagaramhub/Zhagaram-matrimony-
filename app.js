@@ -508,12 +508,12 @@ if (messagesPage) {
   const loadChatMessages = async partnerId => {
     if(!chatUser || !partnerId) return;
     const {data:rows,error}=await supabase.from("messages")
-      .select("id,sender_id,receiver_id,body,created_at")
+      .select("id,sender_id,receiver_id,body,attachment_path,attachment_mime_type,created_at")
       .or("and(sender_id.eq."+chatUser.id+",receiver_id.eq."+partnerId+"),and(sender_id.eq."+partnerId+",receiver_id.eq."+chatUser.id+")")
       .order("created_at",{ascending:true}).limit(200);
     if(error) throw error;
     const list=$("chatMessageList");
-    list.innerHTML=await Promise.all((rows||[]).map(async row=>{
+    list.innerHTML=(await Promise.all((rows||[]).map(async row=>{
       const mine=row.sender_id===chatUser.id;
       const time=new Date(row.created_at).toLocaleString("ta-IN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"short"});
       let media="";
