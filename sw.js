@@ -1,4 +1,4 @@
-const CACHE_NAME = "zhagaram-shell-v15";
+const CACHE_NAME = "zhagaram-shell-v16";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -38,20 +38,19 @@ self.addEventListener("activate", (event) => {
   self.clients.claim();
 });
 
+// Always check the network first so published profile/search fixes are not hidden
+// behind an older cached page. Keep a fresh copy for offline use.
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET" || new URL(request.url).origin !== self.location.origin) return;
 
   event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request).then((response) => {
-        if (response.ok) {
-          const copy = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
-        }
-        return response;
-      }).catch(() => caches.match("./index.html"));
-    })
+    fetch(request).then((response) => {
+      if (response.ok) {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+      }
+      return response;
+    }).catch(() => caches.match(request).then((cached) => cached || caches.match("./index.html")))
   );
 });
