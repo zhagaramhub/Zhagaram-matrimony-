@@ -530,7 +530,7 @@ if (messagesPage) {
     document.querySelectorAll("[data-chat-partner]").forEach(button=>{
       button.classList.toggle("active",button.dataset.chatPartner===partnerId);
     });
-    $("sendChatMessage").hidden=false;
+    $("chatComposer").hidden=false;
     $("chatMessageList").innerHTML='<p class="chat-empty">செய்திகள் ஏற்றப்படுகின்றன...</p>';
     await loadChatMessages(partnerId);
   };
@@ -552,7 +552,7 @@ if (messagesPage) {
         $("chatPartnerList").innerHTML='<p class="chat-empty">Chat தொடங்க, முதலில் ஒருவர் அனுப்பிய Interest-ஐ ஏற்றுக்கொள்ள வேண்டும்.</p>';
         $("chatTitle").textContent="தனிப்பட்ட Chat";
         $("chatSubtitle").textContent="ஏற்றுக்கொள்ளப்பட்ட Interest உள்ளவர்கள் மட்டும்";
-        $("sendChatMessage").hidden=true;
+        $("chatComposer").hidden=true;
         $("chatMessageList").innerHTML='<p class="chat-empty">Interest ஏற்றுக்கொள்ளப்பட்ட பிறகு இங்கே உரையாடலாம்.</p>';
         chatNotice("இன்னும் Chat செய்ய அனுமதிக்கப்பட்ட உறுப்பினர்கள் இல்லை.");
         return;
