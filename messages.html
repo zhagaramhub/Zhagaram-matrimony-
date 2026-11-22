@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f7f4ed"><meta name="description" content="Zhagaram Matrimony private member messages.">
+<title>தனிப்பட்ட செய்திகள் | Zhagaram Matrimony</title>
+<link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="dashboard-ui.css">
+<style>
+.chat-photo-input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.chat-photo-button{display:inline-flex;align-items:center;justify-content:center;min-width:48px;min-height:44px;padding:0 12px;border:1px solid #d9ded8;border-radius:12px;background:#edf5ef;color:#173c32;font-size:22px;cursor:pointer;touch-action:manipulation}
+.chat-photo-button[aria-disabled="true"]{opacity:.55;pointer-events:none}
+.chat-layout{display:grid;grid-template-columns:minmax(220px, .8fr) minmax(0,1.6fr);gap:16px;min-height:500px}
+.chat-panel{background:#fff;border:1px solid #e8e5dc;border-radius:18px;overflow:hidden;min-width:0}
+.chat-panel-heading{padding:17px 18px;border-bottom:1px solid #edf0e9;color:#173c32;font-weight:800}
+.chat-partner-list{padding:8px;display:grid;gap:6px}
+.chat-partner{display:block;width:100%;text-align:left;border:0;background:transparent;border-radius:12px;padding:13px;color:#173c32;cursor:pointer}
+.chat-partner.active,.chat-partner:hover{background:#edf5ef}
+.chat-partner b,.chat-partner small{display:block}.chat-partner small{font-size:12px;color:#758078;margin-top:5px}
+.chat-empty{padding:18px;color:#758078;text-align:center;line-height:1.7}
+.chat-window{display:flex;flex-direction:column;min-height:500px}
+.chat-window-head{padding:17px 18px;border-bottom:1px solid #edf0e9}.chat-window-head h2{margin:0;color:#173c32;font-size:18px}.chat-window-head p{margin:5px 0 0;color:#758078;font-size:12px}
+.chat-message-list{padding:18px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;flex:1;max-height:430px;background:#fbfaf6}
+.chat-bubble{max-width:82%;padding:11px 14px;border-radius:15px;background:#fff;border:1px solid #e8e5dc;align-self:flex-start;overflow-wrap:anywhere}
+.chat-bubble.mine{background:#e8f1eb;border-color:#d8e7dc;align-self:flex-end}
+.chat-bubble p{margin:0;color:#243b32;white-space:pre-wrap;line-height:1.5}.chat-bubble small{display:block;text-align:right;color:#758078;font-size:10px;margin-top:6px}
+.chat-composer{display:flex;gap:9px;padding:13px;border-top:1px solid #edf0e9;background:#fff}
+.chat-composer[hidden]{display:none}.chat-composer input{flex:1;min-width:0;border:1px solid #d9ded8;border-radius:12px;padding:12px;font:inherit}
+.chat-composer button{border:0;border-radius:12px;padding:0 18px;background:#173c32;color:#fff;font-weight:700}
+.chat-composer button:disabled{opacity:.55}
+.chat-composer button{min-height:44px;cursor:pointer}.chat-photo{display:block;max-width:min(100%,260px);max-height:300px;border-radius:12px;object-fit:contain}.chat-photo-link{display:block;margin-top:4px}
+.chat-notice{padding:11px 14px;background:#edf5ef;color:#285b43;border-radius:10px;margin:0 0 14px}.chat-notice.error{background:#fbeeee;color:#9c3434}
+@media(max-width:680px){.chat-layout{grid-template-columns:1fr;min-height:0}.chat-panel{border-radius:14px}.chat-partner-list{display:flex;overflow-x:auto}.chat-partner{min-width:155px}.chat-window{min-height:440px}.chat-message-list{min-height:270px;max-height:48vh}}
+</style>
+</head>
+<body class="member-home">
+<header class="site-header member-header">
+<a class="brand" href="dashboard.html"><span class="brand-mark">ழ</span><span><b>Zhagaram</b><small>MATRIMONY</small></span></a>
+<a class="profile-top-link" href="notifications.html">🔔 அறிவிப்புகள்</a><a class="profile-top-link" href="profile.html">Profile Edit</a>
+<button class="dash-logout" id="dashboardLogout" type="button" aria-label="Logout">↪</button>
+</header>
+<main class="member-main">
+<section class="member-greeting"><div><span class="section-kicker">MEMBER AREA</span><h1>தனிப்பட்ட செய்திகள்</h1><p>Interest ஏற்றுக்கொண்ட உறுப்பினர்களுடன் மட்டும் உரையாடலாம்.</p></div></section>
+<p id="messagesNotice" class="chat-notice" role="status">Chat ஏற்றப்படுகிறது...</p>
+<div class="chat-layout" id="messagesPage">
+<section class="chat-panel"><div class="chat-panel-heading">உங்கள் உரையாடல்கள்</div><div class="chat-partner-list" id="chatPartnerList"><p class="chat-empty">ஏற்றப்படுகிறது...</p></div></section>
+<section class="chat-panel chat-window">
+<div class="chat-window-head"><h2 id="chatTitle">தனிப்பட்ட Chat</h2><p id="chatSubtitle">பாதுகாப்பான உரையாடல்</p></div>
+<div class="chat-message-list" id="chatMessageList"><p class="chat-empty">உரையாடலைத் தேர்ந்தெடுக்கவும்.</p></div>
+<form class="chat-composer" id="chatComposer" hidden>
+<input id="chatMessageInput" type="text" maxlength="2000" autocomplete="off" placeholder="உங்கள் செய்தியை எழுதுங்கள்..." aria-label="செய்தி">
+<input id="chatPhotoInput" class="chat-photo-input" type="file" accept="image/jpeg,image/png,image/webp" aria-label="படத்தைத் தேர்ந்தெடுக்கவும்">
+<label id="attachChatPhotoButton" class="chat-photo-button" for="chatPhotoInput" aria-label="படம் அனுப்பவும்" title="படம் அனுப்பவும்">📷</label>
+<button id="sendChatButton" type="submit">அனுப்பு</button>
+</form>
+</section>
+</div>
+</main>
+<nav class="member-bottom-nav" aria-label="Member navigation">
+<a class="bottom-nav-item" href="dashboard.html"><span class="bottom-icon">⌂</span><small>Home</small></a>
+<a class="bottom-nav-item" href="search.html"><span class="bottom-icon">♡</span><small>Matches</small></a>
+<a class="bottom-nav-item" href="interests.html"><span class="bottom-icon">♥</span><small>Interests</small></a>
+<a class="bottom-nav-item active" href="messages.html"><span class="bottom-icon">✉</span><small>Messages</small></a>
+<a class="bottom-nav-item" href="membership.html"><span class="bottom-icon">✧</span><small>Premium</small></a>
+<a class="bottom-nav-item" href="profile.html"><span class="bottom-icon">♙</span><small>Profile</small></a>
+</nav>
+<div class="toast" id="toast"></div><script type="module" src="app.js"></script>
+</body></html>
