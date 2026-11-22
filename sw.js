@@ -1,4 +1,4 @@
-const CACHE_NAME = "zhagaram-shell-v16";
+const CACHE_NAME = "zhagaram-shell-v17";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -17,6 +17,7 @@ const APP_SHELL = [
   "./crm.css",
   "./admin.css",
   "./search.html",
+  "./view-profile.html",
   "./membership.html"
 ];
 

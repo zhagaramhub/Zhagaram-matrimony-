@@ -221,7 +221,18 @@ const loadLiveProfiles=async()=>{
   if($("emptyState")&&liveSearchProfiles.length===0){$("emptyState").textContent="இன்னும் அங்கீகரிக்கப்பட்ட Profiles இல்லை.";$("emptyState").hidden=false}
  }catch(error){status.textContent="Profiles ஏற்ற முடியவில்லை: "+(error.message||"மீண்டும் முயற்சிக்கவும்.");}
 };
-if($("searchForm")){ $("searchForm").addEventListener("submit",e=>{e.preventDefault();renderLiveProfiles()});loadLiveProfiles();}
+if($("searchForm")){ 
+ $("searchForm").addEventListener("submit",e=>{e.preventDefault();renderLiveProfiles()});
+ const profileGrid=$("profileGrid");
+ profileGrid?.addEventListener("click",event=>{
+   const card=event.target.closest("a.profile-card[href]");
+   if(!card)return;
+   event.preventDefault();
+   const destination=new URL(card.getAttribute("href"),document.baseURI);
+   window.location.assign(destination.href);
+ });
+ loadLiveProfiles();
+}
 if($("registerForm"))$("registerForm").addEventListener("submit",async e=>{e.preventDefault();const btn=e.submitter,email=$("regEmail").value.trim(),password=$("regPassword").value;if(password.length<8){setMessage("authMessage","Password must be at least 8 characters.",true);return}btn.disabled=true;setMessage("authMessage","Creating your account...");try{const {data,error}=await supabase.auth.signUp({email,password});if(error)throw error;if(data.session){setMessage("authMessage","Account created. Opening your profile...");location.href="profile.html"}else setMessage("authMessage","Registration request successful. Verify your email, then login.")}catch(err){setMessage("authMessage",err.message||"Registration failed.",true)}finally{btn.disabled=false}});
 if($("loginForm"))$("loginForm").addEventListener("submit",async e=>{e.preventDefault();const btn=e.submitter;btn.disabled=true;setMessage("authMessage","Signing in...");try{const {data,error}=await supabase.auth.signInWithPassword({email:$("loginEmail").value.trim(),password:$("loginPassword").value});if(error)throw error;const {data:roles,error:roleError}=await supabase.from("user_roles").select("role").eq("user_id",data.user.id);if(roleError)throw roleError;const roleSet=new Set((roles||[]).map(row=>row.role));if(roleSet.has("owner")){location.href="owner.html";return}if(roleSet.has("admin")){location.href="admin.html";return}if(roleSet.has("staff")){location.href="staff.html";return}const {data:profile}=await supabase.from("profiles").select("id").eq("id",data.user.id).maybeSingle();location.href=profile?"dashboard.html":"profile.html"}catch(err){setMessage("authMessage",err.message||"Login failed.",true)}finally{btn.disabled=false}});
 
