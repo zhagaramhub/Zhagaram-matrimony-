@@ -27,6 +27,7 @@
 .profile-card{text-decoration:none;color:inherit;display:block}
 .profile-card:focus-visible{outline:3px solid #c6a35e;outline-offset:3px}
 @media(max-width:520px){.profile-detail-top{align-items:flex-start}.profile-detail-avatar{width:68px;height:68px;flex-basis:68px;border-radius:18px;font-size:30px}}
+ .interest-action-wrap{margin-top:22px}.interest-action-wrap button{cursor:pointer}.interest-action-wrap p{color:#65756e;font-size:13px}
 </style>
 </head>
 <body>
@@ -43,6 +44,7 @@
 <div id="profileDetailContent" hidden>
 <div class="profile-detail-top"><div class="profile-detail-avatar" id="detailAvatar">ழ</div><img class="profile-detail-photo" id="detailPhoto" alt="உறுப்பினர் புகைப்படம்" hidden><div><span class="profile-detail-id" id="detailMemberId"></span><h1 id="detailName"></h1><p id="detailSummary"></p></div></div>
 <div class="profile-detail-grid" id="detailGrid"></div>
+<div class="interest-action-wrap"><button class="btn btn-primary" id="sendInterestButton" type="button" hidden>♡ Interest தெரிவிக்கவும்</button><p id="interestActionMessage" role="status"></p></div>
 <p class="profile-detail-note">தனியுரிமைக்காக கைபேசி எண், மின்னஞ்சல் மற்றும் வருமான விவரங்கள் இந்தப் பக்கத்தில் காட்டப்படாது.</p>
 </div>
 <a class="btn btn-primary" href="search.html" style="margin-top:22px;display:inline-flex">← தேடலுக்குத் திரும்பு</a>

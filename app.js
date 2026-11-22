@@ -429,6 +429,58 @@ if(staffPage){
 }
 
 
+
+
+// Member interest requests: sender and receiver actions are protected by Supabase RLS.
+const interestsPage = $("interestsList");
+if (interestsPage) {
+  const safeInterest = value => String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+  const statusLabel = status => ({pending:"நிலுவையில்",accepted:"ஏற்றுக்கொள்ளப்பட்டது",rejected:"நிராகரிக்கப்பட்டது",withdrawn:"திரும்பப் பெறப்பட்டது"}[status] || status);
+  const showInterestMessage = (message, isError=false) => { const el=$("interestsMessage"); if(el){el.textContent=message;el.classList.toggle("error",isError);} };
+  (async()=>{
+    try {
+      const {data:{user},error:userError}=await supabase.auth.getUser();
+      if(userError) throw userError;
+      if(!user){location.href="login.html";return;}
+      const {data:rows,error}=await supabase.from("interest_requests").select("id,sender_id,receiver_id,status,created_at").or("sender_id.eq."+user.id+",receiver_id.eq."+user.id).order("created_at",{ascending:false}).limit(100);
+      if(error) throw error;
+      const requests=rows||[];
+      const otherIds=[...new Set(requests.map(r=>r.sender_id===user.id?r.receiver_id:r.sender_id))];
+      let people={};
+      if(otherIds.length){
+        const {data:profiles,error:profileError}=await supabase.from("profiles").select("id,full_name,member_id,city,district").in("id",otherIds);
+        if(profileError) throw profileError;
+        people=Object.fromEntries((profiles||[]).map(p=>[p.id,p]));
+      }
+      const incoming=requests.filter(r=>r.receiver_id===user.id);
+      const outgoing=requests.filter(r=>r.sender_id===user.id);
+      const render=(items,kind)=>items.length?items.map(r=>{
+        const other=people[kind==="received"?r.sender_id:r.receiver_id]||{};
+        const name=safeInterest(other.full_name||"Zhagaram Member");
+        const place=[other.city,other.district].filter(Boolean).map(safeInterest).join(", ");
+        const actions=kind==="received"&&r.status==="pending"
+          ? '<button class="btn btn-primary" data-interest-action="accepted" data-interest-id="'+r.id+'">ஏற்கவும்</button> <button class="btn btn-outline" data-interest-action="rejected" data-interest-id="'+r.id+'">நிராகரிக்கவும்</button>'
+          : '<span class="interest-status">'+statusLabel(r.status)+'</span>';
+        return '<article class="interest-row"><div><b>'+name+'</b><small>'+(other.member_id?safeInterest(other.member_id)+" · ":"")+place+'</small></div><div class="interest-actions">'+actions+'</div></article>';
+      }).join(""):'<p class="interest-empty">இன்னும் பதிவுகள் இல்லை.</p>';
+      $("receivedInterests").innerHTML=render(incoming,"received");
+      $("sentInterests").innerHTML=render(outgoing,"sent");
+      showInterestMessage("உங்கள் Interest விவரங்கள் புதுப்பிக்கப்பட்டன.");
+    } catch(err){showInterestMessage(err.message||"Interest விவரங்களை ஏற்ற முடியவில்லை.",true);}
+  })();
+  interestsPage.addEventListener("click",async e=>{
+    const btn=e.target.closest("button[data-interest-action]");
+    if(!btn)return;
+    btn.disabled=true;
+    try{
+      const {error}=await supabase.from("interest_requests").update({status:btn.dataset.interestAction,updated_at:new Date().toISOString()}).eq("id",btn.dataset.interestId).eq("status","pending");
+      if(error)throw error;
+      location.reload();
+    }catch(err){showInterestMessage(err.message||"பதிலைச் சேமிக்க முடியவில்லை.",true);btn.disabled=false;}
+  });
+}
+
+
 // Public member detail view. Only approved public fields are queried; private contacts are never selected.
 const detailPage = $("profileDetail");
 if (detailPage) {
@@ -447,6 +499,33 @@ if (detailPage) {
         .eq("id",id).eq("profile_status","active").maybeSingle();
       if (error) throw error;
       if (!p) throw new Error("இந்த Profile கிடைக்கவில்லை அல்லது தற்போது கிடைக்கவில்லை.");
+
+      const interestButton=$("sendInterestButton");
+      if(user.id!==id){
+        interestButton.hidden=false;
+        const {data:existing,error:existingError}=await supabase.from("interest_requests").select("id,sender_id,receiver_id,status").or("and(sender_id.eq."+user.id+",receiver_id.eq."+id+"),and(sender_id.eq."+id+",receiver_id.eq."+user.id+")").limit(1);
+        if(existingError)throw existingError;
+        const prior=(existing||[])[0];
+        if(prior){
+          interestButton.disabled=true;
+          interestButton.textContent=prior.sender_id===user.id ? "Interest அனுப்பப்பட்டது" : "உங்களுக்கு Interest வந்துள்ளது";
+          $("interestActionMessage").textContent=prior.status==="pending"?"நிலை: நிலுவையில்":prior.status==="accepted"?"Interest ஏற்கப்பட்டது":"முந்தைய Interest பதிவு உள்ளது";
+        }
+        interestButton.addEventListener("click",async()=>{
+          interestButton.disabled=true;
+          $("interestActionMessage").textContent="அனுப்பப்படுகிறது...";
+          try{
+            const {error:sendError}=await supabase.from("interest_requests").insert({sender_id:user.id,receiver_id:id,status:"pending"});
+            if(sendError)throw sendError;
+            interestButton.textContent="Interest அனுப்பப்பட்டது";
+            $("interestActionMessage").textContent="உங்கள் Interest வெற்றிகரமாக அனுப்பப்பட்டது.";
+          }catch(sendError){
+            $("interestActionMessage").textContent=sendError.code==="23505"?"ஏற்கனவே Interest பதிவு உள்ளது.":(sendError.message||"அனுப்ப முடியவில்லை.");
+            interestButton.disabled=false;
+          }
+        });
+      }
+
       $("profileDetailContent").hidden = false;
       $("detailName").textContent = p.full_name || "Zhagaram Member";
       $("detailMemberId").textContent = p.member_id || "ZHAGARAM MEMBER";
