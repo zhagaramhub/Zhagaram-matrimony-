@@ -18,6 +18,7 @@
 .profile-detail-top h1{margin:5px 0;color:#173c32;font-size:clamp(24px,5vw,34px)}
 .profile-detail-top p{margin:5px 0;color:#65756e}
 .profile-detail-id{color:#b08b45;font-size:12px;font-weight:800;letter-spacing:1.2px}
+.verified-badge{display:inline-flex;align-items:center;gap:4px;margin:5px 0;padding:5px 9px;border-radius:20px;background:#eaf5ed;color:#28613b;font-size:11px;font-weight:800}
 .profile-detail-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}
 .detail-item{padding:16px;border-radius:13px;background:#f7f8f5;border:1px solid #edf0e9;display:grid;gap:7px}
 .detail-item span{font-size:12px;color:#758078}
@@ -42,7 +43,7 @@
 <div class="profile-detail-card" id="profileDetail">
 <p id="profileDetailMessage" class="empty-state" role="status">Profile விவரங்கள் ஏற்றப்படுகின்றன...</p>
 <div id="profileDetailContent" hidden>
-<div class="profile-detail-top"><div class="profile-detail-avatar" id="detailAvatar">ழ</div><img class="profile-detail-photo" id="detailPhoto" alt="உறுப்பினர் புகைப்படம்" hidden><div><span class="profile-detail-id" id="detailMemberId"></span><h1 id="detailName"></h1><p id="detailSummary"></p></div></div>
+<div class="profile-detail-top"><div class="profile-detail-avatar" id="detailAvatar">ழ</div><img class="profile-detail-photo" id="detailPhoto" alt="உறுப்பினர் புகைப்படம்" hidden><div><span class="profile-detail-id" id="detailMemberId"></span><h1 id="detailName"></h1><span id="detailVerifiedBadge" class="verified-badge" hidden>✓ சரிபார்க்கப்பட்ட சுயவிவரம்</span><p id="detailSummary"></p></div></div>
 <div class="profile-detail-grid" id="detailGrid"></div>
 <div class="interest-action-wrap"><button class="btn btn-primary" id="sendInterestButton" type="button" hidden>♡ Interest தெரிவிக்கவும்</button><p id="interestActionMessage" role="status"></p></div>
 <p class="profile-detail-note">தனியுரிமைக்காக கைபேசி எண், மின்னஞ்சல் மற்றும் வருமான விவரங்கள் இந்தப் பக்கத்தில் காட்டப்படாது.</p>
