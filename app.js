@@ -264,9 +264,19 @@ if($("phoneLoginForm"))$("phoneLoginForm").addEventListener("submit",async event
 });
 
 async function getUser(){const {data:{user},error}=await supabase.auth.getUser();if(error)throw error;if(!user){location.href="login.html";return null}return user}
+async function loadNotificationBadge(userId){
+ const badge=$("dashboardNotificationCount");
+ if(!badge)return;
+ try{
+  const {count,error}=await supabase.from("notifications").select("id",{count:"exact",head:true}).eq("user_id",userId).eq("is_read",false);
+  if(error)throw error;
+  badge.textContent=count>99?"99+":String(count||0);
+  badge.hidden=!count;
+ }catch(error){badge.hidden=true;}
+}
 let currentProfilePhotoPath=null;
 async function showProfilePhoto(path){const img=$("profilePhotoPreview");if(!img)return;if(!path){img.hidden=true;return}const {data,error}=await supabase.storage.from("profile-photos").createSignedUrl(path,3600);if(error)throw error;img.src=data.signedUrl;img.hidden=false}
-async function loadProfile(){const user=await getUser();if(!user)return;const {data,error}=await supabase.from("profiles").select("id,member_id,full_name,date_of_birth,gender,religion,community,sub_community,height_cm,marital_status,education,occupation,city,district,state,profile_status,photo_path,father_name,mother_name,siblings_details,family_occupation").eq("id",user.id).maybeSingle();if(error){setMessage("profileMessage","Could not load profile: "+error.message,true);return}if($("dashboardHeading")){if(!data){location.href="profile.html";return}const name=data.full_name||"Zhagaram Member";$("dashboardHeading").textContent="வணக்கம், "+name+"!";$("memberName").textContent=name;$("memberInitial").textContent=name.trim().charAt(0).toUpperCase();$("memberId").textContent=data.member_id||"ZH —";$("dashStatus").textContent=data.profile_status||"Pending Review";const {data:roles}=await supabase.from("user_roles").select("role").eq("user_id",user.id);if(roles?.some(row=>row.role==="admin")&&$("adminNavLink"))$("adminNavLink").hidden=false;if(roles?.some(row=>row.role==="owner")&&$("ownerNavLink"))$("ownerNavLink").hidden=false}if($("profileForm")){if(data){$("fullName").value=data.full_name||"";$("dateOfBirth").value=data.date_of_birth||"";$("gender").value=data.gender||"";$("profileReligion").value=data.religion||"";$("community").value=data.community||"";$("subCommunity").value=data.sub_community||"";$("heightCm").value=data.height_cm??"";$("maritalStatus").value=data.marital_status||"";$("education").value=data.education||"";$("occupation").value=data.occupation||"";$("city").value=data.city||"";$("district").value=data.district||"";$("state").value=data.state||"";$("fatherName").value=data.father_name||"";$("motherName").value=data.mother_name||"";$("siblingsDetails").value=data.siblings_details||"";$("familyOccupation").value=data.family_occupation||"";currentProfilePhotoPath=data.photo_path||null;if(currentProfilePhotoPath)showProfilePhoto(currentProfilePhotoPath).catch(()=>{});}const {data:privateData}=await supabase.from("profile_private").select("mobile_number").eq("user_id",user.id).maybeSingle();$("mobile").value=privateData?.mobile_number||""}} 
+async function loadProfile(){const user=await getUser();if(!user)return;const {data,error}=await supabase.from("profiles").select("id,member_id,full_name,date_of_birth,gender,religion,community,sub_community,height_cm,marital_status,education,occupation,city,district,state,profile_status,photo_path,father_name,mother_name,siblings_details,family_occupation").eq("id",user.id).maybeSingle();if(error){setMessage("profileMessage","Could not load profile: "+error.message,true);return}if($("dashboardHeading")){if(!data){location.href="profile.html";return}const name=data.full_name||"Zhagaram Member";$("dashboardHeading").textContent="வணக்கம், "+name+"!";$("memberName").textContent=name;$("memberInitial").textContent=name.trim().charAt(0).toUpperCase();$("memberId").textContent=data.member_id||"ZH —";$("dashStatus").textContent=data.profile_status||"Pending Review";loadNotificationBadge(user.id);const {data:roles}=await supabase.from("user_roles").select("role").eq("user_id",user.id);if(roles?.some(row=>row.role==="admin")&&$("adminNavLink"))$("adminNavLink").hidden=false;if(roles?.some(row=>row.role==="owner")&&$("ownerNavLink"))$("ownerNavLink").hidden=false}if($("profileForm")){if(data){$("fullName").value=data.full_name||"";$("dateOfBirth").value=data.date_of_birth||"";$("gender").value=data.gender||"";$("profileReligion").value=data.religion||"";$("community").value=data.community||"";$("subCommunity").value=data.sub_community||"";$("heightCm").value=data.height_cm??"";$("maritalStatus").value=data.marital_status||"";$("education").value=data.education||"";$("occupation").value=data.occupation||"";$("city").value=data.city||"";$("district").value=data.district||"";$("state").value=data.state||"";$("fatherName").value=data.father_name||"";$("motherName").value=data.mother_name||"";$("siblingsDetails").value=data.siblings_details||"";$("familyOccupation").value=data.family_occupation||"";currentProfilePhotoPath=data.photo_path||null;if(currentProfilePhotoPath)showProfilePhoto(currentProfilePhotoPath).catch(()=>{});}const {data:privateData}=await supabase.from("profile_private").select("mobile_number").eq("user_id",user.id).maybeSingle();$("mobile").value=privateData?.mobile_number||""}} 
 if($("dashboardHeading")||$("profileForm"))loadProfile().catch(err=>{setMessage("profileMessage",err.message,true)});
 if($("profilePhoto"))$("profilePhoto").addEventListener("change",()=>{const file=$("profilePhoto").files?.[0];const img=$("profilePhotoPreview");if(!file||!img)return;if(!["image/jpeg","image/png","image/webp"].includes(file.type)||file.size>5*1024*1024){setMessage("profileMessage","JPG, PNG அல்லது WEBP புகைப்படம் மட்டும். அதிகபட்சம் 5 MB.",true);$("profilePhoto").value="";return}img.src=URL.createObjectURL(file);img.hidden=false;});
 if($("profileForm"))$("profileForm").addEventListener("submit",async e=>{e.preventDefault();const btn=e.submitter;btn.disabled=true;setMessage("profileMessage","Saving your profile...");try{const user=await getUser();if(!user)return;const photoFile=$("profilePhoto")?.files?.[0];if(photoFile){if(!["image/jpeg","image/png","image/webp"].includes(photoFile.type)||photoFile.size>5*1024*1024)throw new Error("JPG, PNG அல்லது WEBP புகைப்படம் மட்டும். அதிகபட்சம் 5 MB.");const ext=photoFile.type==="image/png"?"png":photoFile.type==="image/webp"?"webp":"jpg";const nextPhotoPath=user.id+"/profile-"+Date.now()+"."+ext;const {error:photoError}=await supabase.storage.from("profile-photos").upload(nextPhotoPath,photoFile,{cacheControl:"3600",contentType:photoFile.type,upsert:false});if(photoError)throw photoError;currentProfilePhotoPath=nextPhotoPath;}const profile={id:user.id,photo_path:currentProfilePhotoPath,father_name:$("fatherName").value.trim()||null,mother_name:$("motherName").value.trim()||null,siblings_details:$("siblingsDetails").value.trim()||null,family_occupation:$("familyOccupation").value.trim()||null,full_name:$("fullName").value.trim(),date_of_birth:$("dateOfBirth").value,gender:$("gender").value,religion:$("profileReligion").value.trim()||null,community:$("community").value.trim()||null,sub_community:$("subCommunity").value.trim()||null,height_cm:$("heightCm").value?Number($("heightCm").value):null,marital_status:$("maritalStatus").value||null,education:$("education").value.trim()||null,occupation:$("occupation").value.trim()||null,city:$("city").value.trim()||null,district:$("district").value.trim()||null,state:$("state").value.trim()||null};const {error}=await supabase.from("profiles").upsert(profile,{onConflict:"id"});if(error)throw error;const {error:privateError}=await supabase.from("profile_private").upsert({user_id:user.id,mobile_number:$("mobile").value.trim()},{onConflict:"user_id"});if(privateError)throw privateError;setMessage("profileMessage","Profile saved successfully.");toast("Profile saved");setTimeout(()=>location.href="dashboard.html",700)}catch(err){setMessage("profileMessage",err.message||"Could not save profile.",true)}finally{btn.disabled=false}});
@@ -480,6 +490,57 @@ if (interestsPage) {
   });
 }
 
+
+
+ 
+// Member notifications: RLS restricts reads and updates to the signed-in member.
+const notificationsPage=$("notificationsList");
+if(notificationsPage){
+ const safeNotification=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+ const message=(value,isError=false)=>{const el=$("notificationsMessage");if(el){el.textContent=value;el.classList.toggle("error",isError);}};
+ const loadNotifications=async()=>{
+  const {data:{user},error:userError}=await supabase.auth.getUser();
+  if(userError)throw userError;
+  if(!user){location.href="login.html";return;}
+  const {data:rows,error}=await supabase.from("notifications").select("id,notification_type,title,body,related_id,is_read,created_at").eq("user_id",user.id).order("created_at",{ascending:false}).limit(100);
+  if(error)throw error;
+  const items=rows||[];
+  const unread=items.filter(item=>!item.is_read).length;
+  $("notificationUnreadCount").textContent=unread+" படிக்காத அறிவிப்புகள்";
+  $("notificationRows").innerHTML=items.length?items.map(item=>{
+   const date=new Date(item.created_at).toLocaleString("ta-IN");
+   return '<article class="notification-row '+(item.is_read?'read':'unread')+'" data-notification-row="'+item.id+'"><div class="notification-copy"><b>'+safeNotification(item.title)+'</b><p>'+safeNotification(item.body||"")+'</p><small>'+safeNotification(date)+'</small></div><div class="notification-actions">'+(item.related_id?'<a class="btn btn-outline" href="interests.html">Interest பார்க்க</a> ':'')+(item.is_read?'<span class="notification-read-label">படித்தது</span>':'<button class="btn btn-primary" type="button" data-mark-notification="'+item.id+'">படித்ததாகக் குறி</button>')+'</div></article>';
+  }).join(""):'<p class="notification-empty">இன்னும் அறிவிப்புகள் இல்லை.</p>';
+  $("markAllNotificationsRead").hidden=unread===0;
+  message("உங்கள் அறிவிப்புகள் புதுப்பிக்கப்பட்டன.");
+ };
+ loadNotifications().catch(error=>message(error.message||"அறிவிப்புகளை ஏற்ற முடியவில்லை.",true));
+ notificationsPage.addEventListener("click",async event=>{
+  const button=event.target.closest("button[data-mark-notification]");
+  if(!button)return;
+  button.disabled=true;
+  try{
+   const {data:{user},error:userError}=await supabase.auth.getUser();
+   if(userError)throw userError;
+   if(!user)throw new Error("மீண்டும் உள்நுழையுங்கள்.");
+   const {error}=await supabase.from("notifications").update({is_read:true}).eq("id",button.dataset.markNotification).eq("user_id",user.id);
+   if(error)throw error;
+   await loadNotifications();
+  }catch(error){message(error.message||"புதுப்பிக்க முடியவில்லை.",true);button.disabled=false;}
+ });
+ $("markAllNotificationsRead").addEventListener("click",async()=>{
+  const button=$("markAllNotificationsRead");button.disabled=true;
+  try{
+   const {data:{user},error:userError}=await supabase.auth.getUser();
+   if(userError)throw userError;
+   if(!user)throw new Error("மீண்டும் உள்நுழையுங்கள்.");
+   const {error}=await supabase.from("notifications").update({is_read:true}).eq("user_id",user.id).eq("is_read",false);
+   if(error)throw error;
+   await loadNotifications();
+  }catch(error){message(error.message||"அனைத்தையும் படித்ததாகக் குறிக்க முடியவில்லை.",true);}
+  finally{button.disabled=false;}
+ });
+}
 
 // Public member detail view. Only approved public fields are queried; private contacts are never selected.
 const detailPage = $("profileDetail");
