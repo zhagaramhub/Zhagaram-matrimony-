@@ -6,6 +6,9 @@
 <title>தனிப்பட்ட செய்திகள் | Zhagaram Matrimony</title>
 <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="dashboard-ui.css">
 <style>
+.chat-photo-input{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.chat-photo-button{display:inline-flex;align-items:center;justify-content:center;min-width:48px;min-height:44px;padding:0 12px;border:1px solid #d9ded8;border-radius:12px;background:#edf5ef;color:#173c32;font-size:22px;cursor:pointer;touch-action:manipulation}
+.chat-photo-button[aria-disabled="true"]{opacity:.55;pointer-events:none}
 .chat-layout{display:grid;grid-template-columns:minmax(220px, .8fr) minmax(0,1.6fr);gap:16px;min-height:500px}
 .chat-panel{background:#fff;border:1px solid #e8e5dc;border-radius:18px;overflow:hidden;min-width:0}
 .chat-panel-heading{padding:17px 18px;border-bottom:1px solid #edf0e9;color:#173c32;font-weight:800}
@@ -45,8 +48,8 @@
 <div class="chat-message-list" id="chatMessageList"><p class="chat-empty">உரையாடலைத் தேர்ந்தெடுக்கவும்.</p></div>
 <form class="chat-composer" id="chatComposer" hidden>
 <input id="chatMessageInput" type="text" maxlength="2000" autocomplete="off" placeholder="உங்கள் செய்தியை எழுதுங்கள்..." aria-label="செய்தி">
-<input id="chatPhotoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden aria-label="படத்தைத் தேர்ந்தெடுக்கவும்">
-<button id="attachChatPhotoButton" type="button" aria-label="படம் அனுப்பவும்" title="படம் அனுப்பவும்">📷</button>
+<input id="chatPhotoInput" class="chat-photo-input" type="file" accept="image/jpeg,image/png,image/webp" aria-label="படத்தைத் தேர்ந்தெடுக்கவும்">
+<label id="attachChatPhotoButton" class="chat-photo-button" for="chatPhotoInput" aria-label="படம் அனுப்பவும்" title="படம் அனுப்பவும்">📷</label>
 <button id="sendChatButton" type="submit">அனுப்பு</button>
 </form>
 </section>

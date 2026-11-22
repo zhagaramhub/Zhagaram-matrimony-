@@ -617,31 +617,29 @@ if (messagesPage) {
   $("chatComposer").addEventListener("submit",async event=>{
     event.preventDefault();
     const button=$("sendChatButton");
-    const attachButton=$("attachChatPhotoButton");
     const field=$("chatMessageInput");
     const body=field.value.trim();
     if(!body)return;
-    button.disabled=true;attachButton.disabled=true;
+    button.disabled=true;
     try{
       await sendChatContent({body});
       field.value="";
       chatNotice("செய்தி அனுப்பப்பட்டது.");
     }catch(error){chatNotice(error.message||"செய்தியை அனுப்ப முடியவில்லை.",true);}
-    finally{button.disabled=false;attachButton.disabled=false;}
+    finally{button.disabled=false;}
   });
 
-  $("attachChatPhotoButton").addEventListener("click",()=> $("chatPhotoInput").click());
   $("chatPhotoInput").addEventListener("change",async event=>{
     const file=event.target.files?.[0];
     if(!file)return;
-    const button=$("attachChatPhotoButton");
+    const attachLabel=$("attachChatPhotoButton");
     const sendButton=$("sendChatButton");
-    button.disabled=true;sendButton.disabled=true;
+    attachLabel.setAttribute("aria-disabled","true");sendButton.disabled=true;
     try{
       await sendChatContent({body:"",photoFile:file});
       chatNotice("படம் வெற்றிகரமாக அனுப்பப்பட்டது.");
     }catch(error){chatNotice(error.message||"படத்தை அனுப்ப முடியவில்லை.",true);}
-    finally{button.disabled=false;sendButton.disabled=false;event.target.value="";}
+    finally{attachLabel.removeAttribute("aria-disabled");sendButton.disabled=false;event.target.value="";}
   });
 }
 
