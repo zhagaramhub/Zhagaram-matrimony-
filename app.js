@@ -209,14 +209,14 @@ const renderLiveProfiles=()=>{
  const grid=$("profileGrid");if(!grid)return;
  const g=$("lookingFor")?.value||"all",range=$("ageRange")?.value||"all",religion=$("religion")?.value||"all";
  const filtered=liveSearchProfiles.filter(p=>{const age=profileAge(p.date_of_birth);const ageOk=range==="all"||(age!==null&&((range==="20-25"&&age>=20&&age<=25)||(range==="26-30"&&age>=26&&age<=30)||(range==="31-35"&&age>=31&&age<=35)));const genderOk=g==="all"||(g==="bride"&&p.gender==="female")||(g==="groom"&&p.gender==="male");const religionOk=religion==="all"||String(p.religion||"").toLowerCase()===religion.toLowerCase();return ageOk&&genderOk&&religionOk});
- grid.innerHTML=filtered.map(p=>{const name=searchEscape(p.full_name||"Zhagaram Member");const age=profileAge(p.date_of_birth);const place=[p.city,p.district,p.state].filter(Boolean).map(searchEscape).join(", ");const details=[p.religion,p.education,p.occupation].filter(Boolean).map(searchEscape);const initials=searchEscape((p.full_name||"Z").trim().charAt(0).toUpperCase());return '<article class="profile-card"><div class="profile-visual visual-a"><span>'+initials+'</span></div><div class="profile-info"><span class="profile-id">'+searchEscape(p.member_id||"ZHAGARAM MEMBER")+'</span><h3>'+name+'</h3><p>'+(age!==null?age+" வயது":"வயது விவரம் இல்லை")+(place?" · "+place:"")+'</p><div class="profile-meta">'+(details.length?details.join(" · "):"விவரங்கள் விரைவில்")+'</div></div></article>'}).join("");
+ grid.innerHTML=filtered.map(p=>{const name=searchEscape(p.full_name||"Zhagaram Member");const age=profileAge(p.date_of_birth);const place=[p.city,p.district,p.state].filter(Boolean).map(searchEscape).join(", ");const details=[p.religion,p.education,p.occupation].filter(Boolean).map(searchEscape);const initials=searchEscape((p.full_name||"Z").trim().charAt(0).toUpperCase());return '<a class="profile-card" href="view-profile.html?id='+encodeURIComponent(p.id)+'" aria-label="'+name+' விவரங்களைப் பார்க்க"><div class="profile-visual visual-a"><span>'+initials+'</span></div><div class="profile-info"><span class="profile-id">'+searchEscape(p.member_id||"ZHAGARAM MEMBER")+'</span><h3>'+name+'</h3><p>'+(age!==null?age+" வயது":"வயது விவரம் இல்லை")+(place?" · "+place:"")+'</p><div class="profile-meta">'+(details.length?details.join(" · "):"விவரங்கள் விரைவில்")+'</div><span class="profile-open-link">விவரங்களைப் பார்க்க →</span></div></a>'}).join("");
  if($("emptyState"))$("emptyState").hidden=filtered.length!==0;
 };
 const loadLiveProfiles=async()=>{
  const status=$("searchMessage");if(!status)return;
  try{const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;
   if(!user){status.innerHTML='உறுப்பினர் Profiles பார்க்க <a href="login.html">உள்நுழையுங்கள்</a>.';return}
-  const {data,error}=await supabase.from("profiles").select("member_id,full_name,date_of_birth,gender,religion,education,occupation,city,district,state").eq("profile_status","active").order("created_at",{ascending:false}).limit(100);
+  const {data,error}=await supabase.from("profiles").select("id,member_id,full_name,date_of_birth,gender,religion,community,sub_community,education,occupation,height_cm,marital_status,city,district,state").eq("profile_status","active").order("created_at",{ascending:false}).limit(100);
   if(error)throw error;liveSearchProfiles=data||[];status.hidden=true;renderLiveProfiles();
   if($("emptyState")&&liveSearchProfiles.length===0){$("emptyState").textContent="இன்னும் அங்கீகரிக்கப்பட்ட Profiles இல்லை.";$("emptyState").hidden=false}
  }catch(error){status.textContent="Profiles ஏற்ற முடியவில்லை: "+(error.message||"மீண்டும் முயற்சிக்கவும்.");}
@@ -412,4 +412,39 @@ if(staffPage){
  $("refreshTasks")?.addEventListener("click",()=>load().catch(e=>msg(e.message,true)));
  $("staffTaskRows")?.addEventListener("change",async e=>{const s=e.target.closest("select[data-task-id]");if(!s||!currentUser)return;s.disabled=true;try{const {error}=await supabase.from("staff_tasks").update({status:s.value,updated_at:new Date().toISOString()}).eq("id",s.dataset.taskId).eq("assigned_to",currentUser.id);if(error)throw error;await load()}catch(err){msg(err.message||"நிலையைப் புதுப்பிக்க முடியவில்லை.",true)}finally{s.disabled=false}});
  $("staffLogout")?.addEventListener("click",logout);
+}
+
+
+// Public member detail view. Only approved public fields are queried; private contacts are never selected.
+const detailPage = $("profileDetail");
+if (detailPage) {
+  const safeDetail = value => String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+  const setDetail = (label, value) => '<div class="detail-item"><span>'+label+'</span><b>'+safeDetail(value || "குறிப்பிடப்படவில்லை")+'</b></div>';
+  (async () => {
+    const message = $("profileDetailMessage");
+    try {
+      const {data:{user},error:userError} = await supabase.auth.getUser();
+      if (userError) throw userError;
+      if (!user) { message.innerHTML = 'Profile பார்க்க <a href="login.html">உள்நுழையுங்கள்</a>.'; return; }
+      const id = new URLSearchParams(location.search).get("id");
+      if (!id) throw new Error("Profile அடையாளம் கிடைக்கவில்லை.");
+      const {data:p,error} = await supabase.from("profiles")
+        .select("member_id,full_name,date_of_birth,gender,religion,community,sub_community,education,occupation,height_cm,marital_status,city,district,state,profile_status")
+        .eq("id",id).eq("profile_status","active").maybeSingle();
+      if (error) throw error;
+      if (!p) throw new Error("இந்த Profile கிடைக்கவில்லை அல்லது தற்போது கிடைக்கவில்லை.");
+      $("profileDetailContent").hidden = false;
+      $("detailName").textContent = p.full_name || "Zhagaram Member";
+      $("detailMemberId").textContent = p.member_id || "ZHAGARAM MEMBER";
+      const age = profileAge(p.date_of_birth);
+      $("detailSummary").textContent = [age !== null ? age+" வயது" : null, p.gender === "female" ? "மணமகள்" : p.gender === "male" ? "மணமகன்" : null, [p.city,p.district,p.state].filter(Boolean).join(", ")].filter(Boolean).join(" · ");
+      $("detailGrid").innerHTML =
+        setDetail("மதம்",p.religion)+setDetail("சமூகம்",p.community)+setDetail("உள் சமூகம்",p.sub_community)+
+        setDetail("கல்வி",p.education)+setDetail("வேலை",p.occupation)+setDetail("உயரம்",p.height_cm ? p.height_cm+" செ.மீ." : null)+
+        setDetail("திருமண நிலை",p.marital_status)+setDetail("நகரம்",p.city)+setDetail("மாவட்டம்",p.district)+setDetail("மாநிலம்",p.state);
+      message.hidden = true;
+    } catch (error) {
+      message.textContent = error.message || "Profile விவரங்களை ஏற்ற முடியவில்லை.";
+    }
+  })();
 }
