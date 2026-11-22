@@ -365,6 +365,18 @@ if (adminPage) {
       '<div class="audit-item"><div><b>' + safeText(item.old_status) + ' → ' + safeText(item.new_status) + '</b><small>Profile: ' + safeText(String(item.profile_id || "நீக்கப்பட்டது").slice(0,8)) + ' · ' + safeText(formatDate(item.changed_at)) + '</small></div><span class="audit-change">நிர்வாக மாற்றம்</span></div>'
     ).join("") : '<p class="table-empty">இதுவரை நிர்வாக மாற்றங்கள் எதுவும் இல்லை.</p>';
   };
+  const loadVerificationAudit = async () => {
+    const {data,error} = await supabase.rpc("get_admin_profile_verification_audit",{p_limit:50});
+    if (error) throw error;
+    const el = $("verificationAuditRows");
+    el.innerHTML = data && data.length ? data.map(item => {
+      const change = item.new_verified ? "✓ Verified Badge வழங்கப்பட்டது" : "Verified Badge நீக்கப்பட்டது";
+      const member = safeText(item.profile_name) + " · " + safeText(item.profile_member_id);
+      const actor = "Admin: " + safeText(item.actor_name || "Admin");
+      const when = item.changed_at ? new Date(item.changed_at).toLocaleString(zhLanguage==="ta"?"ta-IN":"en-IN",{year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"}) : "—";
+      return '<div class="audit-item"><div><b>' + change + '</b><small>' + member + ' · ' + actor + ' · ' + safeText(when) + '</small></div><span class="audit-change">Badge History</span></div>';
+    }).join("") : '<p class="table-empty">இதுவரை Verified Badge மாற்றங்கள் எதுவும் இல்லை.</p>';
+  };
   const updateVerification = async (row, nextValue, button) => {
     if (!confirm(nextValue === "true" ? "இந்த உறுப்பினரின் விவரங்களைச் சரிபார்த்து Verified Badge வழங்கவா?" : "Verified Badge-ஐ நீக்கவா?")) return;
     button.disabled = true;
@@ -373,7 +385,7 @@ if (adminPage) {
       if (error) throw error;
       if (!data) throw new Error("சரிபார்ப்பு நிலையை மாற்ற முடியவில்லை.");
       toast(nextValue === "true" ? "Verified Badge வழங்கப்பட்டது." : "Verified Badge நீக்கப்பட்டது.");
-      await loadMembers();
+      await Promise.all([loadMembers(),loadVerificationAudit()]);
     } catch (error) { showAdminMessage(error.message || "சரிபார்க்க முடியவில்லை.", "error"); }
     finally { button.disabled = false; }
   };
@@ -399,7 +411,7 @@ if (adminPage) {
     try {
       const user = await requireAdmin();
       if (!user) return;
-      await Promise.all([loadMembers(),loadAudit()]);
+      await Promise.all([loadMembers(),loadAudit(),loadVerificationAudit()]);
     } catch (error) {
       showAdminMessage(error.message || "Admin Dashboard ஏற்றப்படவில்லை.", "error");
     }
@@ -408,6 +420,7 @@ if (adminPage) {
   $("statusFilter")?.addEventListener("change",renderMembers);
   $("refreshMembers")?.addEventListener("click",()=>loadMembers().catch(e=>showAdminMessage(e.message,"error")));
   $("refreshAudit")?.addEventListener("click",()=>loadAudit().catch(e=>showAdminMessage(e.message,"error")));
+  $("refreshVerificationAudit")?.addEventListener("click",()=>loadVerificationAudit().catch(e=>showAdminMessage(e.message,"error")));
   $("memberRows")?.addEventListener("click",event => {
     const button = event.target.closest("button[data-status],button[data-verify]");
     if (!button) return;

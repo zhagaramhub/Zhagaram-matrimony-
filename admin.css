@@ -36,3 +36,6 @@
 @media(max-width:420px){.admin-shell{margin:25px auto 55px}.admin-stats article{padding:14px}.admin-stats b{font-size:24px}.admin-user{width:100%}.audit-item{align-items:flex-start;flex-direction:column;gap:5px}}
 
 .verified-badge{display:inline-flex;align-items:center;gap:4px;margin:3px 0;padding:4px 8px;border-radius:20px;background:#eaf5ed;color:#28613b;font-size:10px;font-weight:800;white-space:nowrap}
+
+.verification-audit-panel .audit-change{color:#28613b}
+.verification-audit-panel .audit-item{padding:14px 2px}
