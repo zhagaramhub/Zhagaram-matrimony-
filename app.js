@@ -216,7 +216,7 @@ const loadLiveProfiles=async()=>{
  const status=$("searchMessage");if(!status)return;
  try{const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;
   if(!user){status.innerHTML='உறுப்பினர் Profiles பார்க்க <a href="login.html">உள்நுழையுங்கள்</a>.';return}
-  const {data,error}=await supabase.from("profiles").select("id,member_id,full_name,date_of_birth,gender,religion,community,sub_community,education,occupation,height_cm,marital_status,city,district,state").eq("profile_status","active").order("created_at",{ascending:false}).limit(100);
+  const {data,error}=await supabase.from("profiles").select("id,member_id,full_name,date_of_birth,gender,religion,community,sub_community,education,occupation,height_cm,marital_status,city,district,state,is_verified").eq("profile_status","active").order("created_at",{ascending:false}).limit(100);
   if(error)throw error;liveSearchProfiles=data||[];status.hidden=true;renderLiveProfiles();
   if($("emptyState")&&liveSearchProfiles.length===0){$("emptyState").textContent="இன்னும் அங்கீகரிக்கப்பட்ட Profiles இல்லை.";$("emptyState").hidden=false}
  }catch(error){status.textContent="Profiles ஏற்ற முடியவில்லை: "+(error.message||"மீண்டும் முயற்சிக்கவும்.");}
@@ -329,6 +329,7 @@ if (adminPage) {
       [p.full_name,p.city,p.district,p.state,p.education,p.occupation].some(v => String(v || "").toLocaleLowerCase().includes(term)));
     $("memberRows").innerHTML = rows.length ? rows.map(p => {
       const current = p.profile_status || "pending";
+      const verifyAction = current === "active" ? (p.is_verified ? '<button class="action-btn action-restore" data-verify="false">Badge நீக்கு</button>' : '<button class="action-btn action-approve" data-verify="true">✓ Verify</button>') : "";
       const actions = current === "pending"
         ? '<button class="action-btn action-approve" data-status="active">அங்கீகரி</button><button class="action-btn action-reject" data-status="rejected">நிராகரி</button>'
         : current === "active"
@@ -339,7 +340,7 @@ if (adminPage) {
         '<td>' + safeText([p.city,p.district,p.state].filter(Boolean).join(", ") || "—") + '</td>' +
         '<td>' + safeText([p.education,p.occupation].filter(Boolean).join(" · ") || "—") + '</td>' +
         '<td><span class="status-pill ' + safeText(current) + '">' + safeText(statusLabels[current] || current) + '</span></td>' +
-        '<td><div class="action-group">' + actions + '</div></td></tr>';
+        '<td><div class="action-group">' + actions + verifyAction + '</div></td></tr>';
     }).join("") : '<tr><td colspan="5" class="table-empty">பொருத்தமான உறுப்பினர்கள் இல்லை.</td></tr>';
     $("totalCount").textContent = adminMembers.length;
     $("pendingCount").textContent = adminMembers.filter(p => p.profile_status === "pending").length;
@@ -349,7 +350,7 @@ if (adminPage) {
   const loadMembers = async () => {
     showAdminMessage("உறுப்பினர் விவரங்கள் ஏற்றப்படுகின்றன...");
     const {data,error} = await supabase.from("profiles")
-      .select("id,member_id,full_name,gender,city,district,state,education,occupation,profile_status,created_at")
+      .select("id,member_id,full_name,gender,city,district,state,education,occupation,profile_status,is_verified,created_at")
       .order("created_at",{ascending:false}).limit(500);
     if (error) throw error;
     adminMembers = data || [];
@@ -363,6 +364,18 @@ if (adminPage) {
     el.innerHTML = data && data.length ? data.map(item =>
       '<div class="audit-item"><div><b>' + safeText(item.old_status) + ' → ' + safeText(item.new_status) + '</b><small>Profile: ' + safeText(String(item.profile_id || "நீக்கப்பட்டது").slice(0,8)) + ' · ' + safeText(formatDate(item.changed_at)) + '</small></div><span class="audit-change">நிர்வாக மாற்றம்</span></div>'
     ).join("") : '<p class="table-empty">இதுவரை நிர்வாக மாற்றங்கள் எதுவும் இல்லை.</p>';
+  };
+  const updateVerification = async (row, nextValue, button) => {
+    if (!confirm(nextValue === "true" ? "இந்த உறுப்பினரின் விவரங்களைச் சரிபார்த்து Verified Badge வழங்கவா?" : "Verified Badge-ஐ நீக்கவா?")) return;
+    button.disabled = true;
+    try {
+      const {data,error} = await supabase.from("profiles").update({is_verified:nextValue === "true"}).eq("id",row.dataset.id).select("id,is_verified").maybeSingle();
+      if (error) throw error;
+      if (!data) throw new Error("சரிபார்ப்பு நிலையை மாற்ற முடியவில்லை.");
+      toast(nextValue === "true" ? "Verified Badge வழங்கப்பட்டது." : "Verified Badge நீக்கப்பட்டது.");
+      await loadMembers();
+    } catch (error) { showAdminMessage(error.message || "சரிபார்க்க முடியவில்லை.", "error"); }
+    finally { button.disabled = false; }
   };
   const updateMemberStatus = async (row, nextStatus, button) => {
     const id = row.dataset.id;
@@ -396,10 +409,12 @@ if (adminPage) {
   $("refreshMembers")?.addEventListener("click",()=>loadMembers().catch(e=>showAdminMessage(e.message,"error")));
   $("refreshAudit")?.addEventListener("click",()=>loadAudit().catch(e=>showAdminMessage(e.message,"error")));
   $("memberRows")?.addEventListener("click",event => {
-    const button = event.target.closest("button[data-status]");
+    const button = event.target.closest("button[data-status],button[data-verify]");
     if (!button) return;
     const row = button.closest("tr[data-id]");
-    if (row) updateMemberStatus(row,button.dataset.status,button);
+    if (!row) return;
+    if (button.hasAttribute("data-verify")) updateVerification(row,button.dataset.verify,button);
+    else updateMemberStatus(row,button.dataset.status,button);
   });
   $("adminLogout")?.addEventListener("click",logout);
 }
@@ -706,7 +721,7 @@ if (detailPage) {
       const id = new URLSearchParams(location.search).get("id");
       if (!id) throw new Error("Profile அடையாளம் கிடைக்கவில்லை.");
       const {data:p,error} = await supabase.from("profiles")
-        .select("member_id,full_name,date_of_birth,gender,religion,community,sub_community,education,occupation,height_cm,marital_status,city,district,state,profile_status,photo_path,father_name,mother_name,siblings_details,family_occupation")
+        .select("member_id,full_name,date_of_birth,gender,religion,community,sub_community,education,occupation,height_cm,marital_status,city,district,state,profile_status,is_verified,photo_path,father_name,mother_name,siblings_details,family_occupation")
         .eq("id",id).eq("profile_status","active").maybeSingle();
       if (error) throw error;
       if (!p) throw new Error("இந்த Profile கிடைக்கவில்லை அல்லது தற்போது கிடைக்கவில்லை.");
@@ -740,6 +755,7 @@ if (detailPage) {
       $("profileDetailContent").hidden = false;
       $("detailName").textContent = p.full_name || "Zhagaram Member";
       $("detailMemberId").textContent = p.member_id || "ZHAGARAM MEMBER";
+      $("detailVerifiedBadge").hidden = !p.is_verified;
       if(p.photo_path){const {data:photoData}=await supabase.storage.from("profile-photos").createSignedUrl(p.photo_path,3600);if(photoData?.signedUrl){$("detailPhoto").src=photoData.signedUrl;$("detailPhoto").hidden=false;$("detailAvatar").hidden=true;}}
       const age = profileAge(p.date_of_birth);
       $("detailSummary").textContent = [age !== null ? age+" வயது" : null, p.gender === "female" ? "மணமகள்" : p.gender === "male" ? "மணமகன்" : null, [p.city,p.district,p.state].filter(Boolean).join(", ")].filter(Boolean).join(" · ");
