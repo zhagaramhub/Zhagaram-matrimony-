@@ -513,11 +513,17 @@ if (messagesPage) {
       .order("created_at",{ascending:true}).limit(200);
     if(error) throw error;
     const list=$("chatMessageList");
-    list.innerHTML=(rows||[]).map(row=>{
+    list.innerHTML=await Promise.all((rows||[]).map(async row=>{
       const mine=row.sender_id===chatUser.id;
       const time=new Date(row.created_at).toLocaleString("ta-IN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"short"});
-      return '<article class="chat-bubble '+(mine?'mine':'theirs')+'"><p>'+safeChat(row.body)+'</p><small>'+safeChat(time)+'</small></article>';
-    }).join("") || '<p class="chat-empty">வணக்கம் சொல்லி உரையாடலைத் தொடங்குங்கள்.</p>';
+      let media="";
+      if(row.attachment_path){
+        const {data:fileData,error:fileError}=await supabase.storage.from("chat-photos").createSignedUrl(row.attachment_path,3600);
+        if(fileError) throw fileError;
+        if(fileData?.signedUrl) media='<a class="chat-photo-link" href="'+safeChat(fileData.signedUrl)+'" target="_blank" rel="noopener noreferrer"><img class="chat-photo" src="'+safeChat(fileData.signedUrl)+'" alt="அனுப்பிய படம்" loading="lazy"></a>';
+      }
+      return '<article class="chat-bubble '+(mine?'mine':'theirs')+'">'+(row.body&&row.body!=="📷 படம்"?'<p>'+safeChat(row.body)+'</p>':'')+media+'<small>'+safeChat(time)+'</small></article>';
+    }))).join("") || '<p class="chat-empty">வணக்கம் சொல்லி உரையாடலைத் தொடங்குங்கள்.</p>';
     list.scrollTop=list.scrollHeight;
   };
 
@@ -581,27 +587,61 @@ if (messagesPage) {
     catch(error){chatNotice(error.message||"செய்திகளை ஏற்ற முடியவில்லை.",true);}
   });
 
+  const sendChatContent = async ({body,photoFile=null}) => {
+    if(!currentChatPartner || (!body && !photoFile)) return;
+    if(body.length>2000) throw new Error("ஒரு செய்தி அதிகபட்சம் 2000 எழுத்துகள் இருக்கலாம்.");
+    let attachmentPath=null;
+    if(photoFile){
+      const allowed=["image/jpeg","image/png","image/webp"];
+      if(!allowed.includes(photoFile.type)) throw new Error("JPG, PNG அல்லது WEBP படங்களை மட்டும் அனுப்பலாம்.");
+      if(photoFile.size>5*1024*1024) throw new Error("படத்தின் அளவு 5 MB-க்கு குறைவாக இருக்க வேண்டும்.");
+      const extension=photoFile.type==="image/jpeg"?"jpg":photoFile.type==="image/png"?"png":"webp";
+      attachmentPath=chatUser.id+"/"+currentChatPartner+"/"+crypto.randomUUID()+"."+extension;
+      const {error:uploadError}=await supabase.storage.from("chat-photos").upload(attachmentPath,photoFile,{contentType:photoFile.type,upsert:false});
+      if(uploadError) throw uploadError;
+    }
+    const {error}=await supabase.from("messages").insert({
+      sender_id:chatUser.id,
+      receiver_id:currentChatPartner,
+      body:body || "📷 படம்",
+      attachment_path:attachmentPath,
+      attachment_mime_type:photoFile?.type || null
+    });
+    if(error){
+      if(attachmentPath) await supabase.storage.from("chat-photos").remove([attachmentPath]);
+      throw error;
+    }
+    await loadChatMessages(currentChatPartner);
+  };
+
   $("chatComposer").addEventListener("submit",async event=>{
     event.preventDefault();
     const button=$("sendChatButton");
+    const attachButton=$("attachChatPhotoButton");
     const field=$("chatMessageInput");
     const body=field.value.trim();
-    if(!currentChatPartner || !body)return;
-    if(body.length>2000){chatNotice("ஒரு செய்தி அதிகபட்சம் 2000 எழுத்துகள் இருக்கலாம்.",true);return;}
-    button.disabled=true;
+    if(!body)return;
+    button.disabled=true;attachButton.disabled=true;
     try{
-      const {error}=await supabase.from("messages").insert({
-        sender_id:chatUser.id,
-        receiver_id:currentChatPartner,
-        body
-      });
-      if(error)throw error;
+      await sendChatContent({body});
       field.value="";
-      await loadChatMessages(currentChatPartner);
       chatNotice("செய்தி அனுப்பப்பட்டது.");
-    }catch(error){
-      chatNotice(error.message||"செய்தியை அனுப்ப முடியவில்லை.",true);
-    }finally{button.disabled=false;}
+    }catch(error){chatNotice(error.message||"செய்தியை அனுப்ப முடியவில்லை.",true);}
+    finally{button.disabled=false;attachButton.disabled=false;}
+  });
+
+  $("attachChatPhotoButton").addEventListener("click",()=> $("chatPhotoInput").click());
+  $("chatPhotoInput").addEventListener("change",async event=>{
+    const file=event.target.files?.[0];
+    if(!file)return;
+    const button=$("attachChatPhotoButton");
+    const sendButton=$("sendChatButton");
+    button.disabled=true;sendButton.disabled=true;
+    try{
+      await sendChatContent({body:"",photoFile:file});
+      chatNotice("படம் வெற்றிகரமாக அனுப்பப்பட்டது.");
+    }catch(error){chatNotice(error.message||"படத்தை அனுப்ப முடியவில்லை.",true);}
+    finally{button.disabled=false;sendButton.disabled=false;event.target.value="";}
   });
 }
 

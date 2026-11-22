@@ -24,6 +24,7 @@
 .chat-composer[hidden]{display:none}.chat-composer input{flex:1;min-width:0;border:1px solid #d9ded8;border-radius:12px;padding:12px;font:inherit}
 .chat-composer button{border:0;border-radius:12px;padding:0 18px;background:#173c32;color:#fff;font-weight:700}
 .chat-composer button:disabled{opacity:.55}
+.chat-composer button{min-height:44px;cursor:pointer}.chat-photo{display:block;max-width:min(100%,260px);max-height:300px;border-radius:12px;object-fit:contain}.chat-photo-link{display:block;margin-top:4px}
 .chat-notice{padding:11px 14px;background:#edf5ef;color:#285b43;border-radius:10px;margin:0 0 14px}.chat-notice.error{background:#fbeeee;color:#9c3434}
 @media(max-width:680px){.chat-layout{grid-template-columns:1fr;min-height:0}.chat-panel{border-radius:14px}.chat-partner-list{display:flex;overflow-x:auto}.chat-partner{min-width:155px}.chat-window{min-height:440px}.chat-message-list{min-height:270px;max-height:48vh}}
 </style>
@@ -44,6 +45,8 @@
 <div class="chat-message-list" id="chatMessageList"><p class="chat-empty">உரையாடலைத் தேர்ந்தெடுக்கவும்.</p></div>
 <form class="chat-composer" id="chatComposer" hidden>
 <input id="chatMessageInput" type="text" maxlength="2000" autocomplete="off" placeholder="உங்கள் செய்தியை எழுதுங்கள்..." aria-label="செய்தி">
+<input id="chatPhotoInput" type="file" accept="image/jpeg,image/png,image/webp" hidden aria-label="படத்தைத் தேர்ந்தெடுக்கவும்">
+<button id="attachChatPhotoButton" type="button" aria-label="படம் அனுப்பவும்" title="படம் அனுப்பவும்">📷</button>
 <button id="sendChatButton" type="submit">அனுப்பு</button>
 </form>
 </section>
