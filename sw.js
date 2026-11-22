@@ -1,4 +1,4 @@
-const CACHE_NAME = "zhagaram-shell-v20";
+const CACHE_NAME = "zhagaram-shell-v21";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -20,7 +20,8 @@ const APP_SHELL = [
   "./view-profile.html",
   "./membership.html",
   "./interests.html",
-  "./notifications.html"
+  "./notifications.html",
+  "./messages.html"
 ];
 
 self.addEventListener("install", (event) => {

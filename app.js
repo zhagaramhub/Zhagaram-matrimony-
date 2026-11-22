@@ -493,6 +493,118 @@ if (interestsPage) {
 
 
  
+// Private member chat: only members with an accepted Interest can open and message each other.
+const messagesPage = $("messagesPage");
+if (messagesPage) {
+  const safeChat = value => String(value ?? "").replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+  const chatNotice = (value, isError=false) => {
+    const el=$("messagesNotice");
+    if(el){el.textContent=value;el.classList.toggle("error",isError);}
+  };
+  let chatUser=null;
+  let chatPartners={};
+  let currentChatPartner=null;
+
+  const loadChatMessages = async partnerId => {
+    if(!chatUser || !partnerId) return;
+    const {data:rows,error}=await supabase.from("messages")
+      .select("id,sender_id,receiver_id,body,created_at")
+      .or("and(sender_id.eq."+chatUser.id+",receiver_id.eq."+partnerId+"),and(sender_id.eq."+partnerId+",receiver_id.eq."+chatUser.id+")")
+      .order("created_at",{ascending:true}).limit(200);
+    if(error) throw error;
+    const list=$("chatMessageList");
+    list.innerHTML=(rows||[]).map(row=>{
+      const mine=row.sender_id===chatUser.id;
+      const time=new Date(row.created_at).toLocaleString("ta-IN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"short"});
+      return '<article class="chat-bubble '+(mine?'mine':'theirs')+'"><p>'+safeChat(row.body)+'</p><small>'+safeChat(time)+'</small></article>';
+    }).join("") || '<p class="chat-empty">வணக்கம் சொல்லி உரையாடலைத் தொடங்குங்கள்.</p>';
+    list.scrollTop=list.scrollHeight;
+  };
+
+  const openChat = async partnerId => {
+    const partner=chatPartners[partnerId];
+    if(!partner) return;
+    currentChatPartner=partnerId;
+    $("chatTitle").textContent=partner.full_name||"Zhagaram Member";
+    $("chatSubtitle").textContent=[partner.member_id,partner.city,partner.district].filter(Boolean).join(" · ");
+    document.querySelectorAll("[data-chat-partner]").forEach(button=>{
+      button.classList.toggle("active",button.dataset.chatPartner===partnerId);
+    });
+    $("chatComposer").hidden=false;
+    $("chatMessageList").innerHTML='<p class="chat-empty">செய்திகள் ஏற்றப்படுகின்றன...</p>';
+    await loadChatMessages(partnerId);
+  };
+
+  (async()=>{
+    try{
+      const {data:{user},error:userError}=await supabase.auth.getUser();
+      if(userError) throw userError;
+      if(!user){location.href="login.html";return;}
+      chatUser=user;
+      const {data:requests,error}=await supabase.from("interest_requests")
+        .select("sender_id,receiver_id,created_at")
+        .eq("status","accepted")
+        .or("sender_id.eq."+user.id+",receiver_id.eq."+user.id)
+        .order("created_at",{ascending:false});
+      if(error) throw error;
+      const partnerIds=[...new Set((requests||[]).map(row=>row.sender_id===user.id?row.receiver_id:row.sender_id))];
+      if(!partnerIds.length){
+        $("chatPartnerList").innerHTML='<p class="chat-empty">Chat தொடங்க, முதலில் ஒருவர் அனுப்பிய Interest-ஐ ஏற்றுக்கொள்ள வேண்டும்.</p>';
+        $("chatTitle").textContent="தனிப்பட்ட Chat";
+        $("chatSubtitle").textContent="ஏற்றுக்கொள்ளப்பட்ட Interest உள்ளவர்கள் மட்டும்";
+        $("chatComposer").hidden=true;
+        $("chatMessageList").innerHTML='<p class="chat-empty">Interest ஏற்றுக்கொள்ளப்பட்ட பிறகு இங்கே உரையாடலாம்.</p>';
+        chatNotice("இன்னும் Chat செய்ய அனுமதிக்கப்பட்ட உறுப்பினர்கள் இல்லை.");
+        return;
+      }
+      const {data:profiles,error:profileError}=await supabase.from("profiles")
+        .select("id,full_name,member_id,city,district")
+        .in("id",partnerIds);
+      if(profileError) throw profileError;
+      chatPartners=Object.fromEntries((profiles||[]).map(profile=>[profile.id,profile]));
+      const available=partnerIds.filter(id=>chatPartners[id]);
+      $("chatPartnerList").innerHTML=available.map(id=>{
+        const person=chatPartners[id];
+        return '<button class="chat-partner" type="button" data-chat-partner="'+safeChat(id)+'"><b>'+safeChat(person.full_name||"Zhagaram Member")+'</b><small>'+safeChat([person.member_id,person.city].filter(Boolean).join(" · "))+'</small></button>';
+      }).join("") || '<p class="chat-empty">உறுப்பினர் விவரங்கள் கிடைக்கவில்லை.</p>';
+      if(available.length) await openChat(available[0]);
+      chatNotice("உங்கள் தனிப்பட்ட உரையாடல்கள் ஏற்றப்பட்டன.");
+    }catch(error){
+      chatNotice(error.message||"Chat-ஐ ஏற்ற முடியவில்லை.",true);
+    }
+  })();
+
+  $("chatPartnerList").addEventListener("click",async event=>{
+    const button=event.target.closest("button[data-chat-partner]");
+    if(!button)return;
+    try{await openChat(button.dataset.chatPartner);}
+    catch(error){chatNotice(error.message||"செய்திகளை ஏற்ற முடியவில்லை.",true);}
+  });
+
+  $("sendChatMessage").addEventListener("submit",async event=>{
+    event.preventDefault();
+    const button=$("sendChatButton");
+    const field=$("chatMessageInput");
+    const body=field.value.trim();
+    if(!currentChatPartner || !body)return;
+    if(body.length>2000){chatNotice("ஒரு செய்தி அதிகபட்சம் 2000 எழுத்துகள் இருக்கலாம்.",true);return;}
+    button.disabled=true;
+    try{
+      const {error}=await supabase.from("messages").insert({
+        sender_id:chatUser.id,
+        receiver_id:currentChatPartner,
+        body
+      });
+      if(error)throw error;
+      field.value="";
+      await loadChatMessages(currentChatPartner);
+      chatNotice("செய்தி அனுப்பப்பட்டது.");
+    }catch(error){
+      chatNotice(error.message||"செய்தியை அனுப்ப முடியவில்லை.",true);
+    }finally{button.disabled=false;}
+  });
+}
+
 // Member notifications: RLS restricts reads and updates to the signed-in member.
 const notificationsPage=$("notificationsList");
 if(notificationsPage){
@@ -509,7 +621,7 @@ if(notificationsPage){
   $("notificationUnreadCount").textContent=unread+" படிக்காத அறிவிப்புகள்";
   $("notificationRows").innerHTML=items.length?items.map(item=>{
    const date=new Date(item.created_at).toLocaleString("ta-IN");
-   return '<article class="notification-row '+(item.is_read?'read':'unread')+'" data-notification-row="'+item.id+'"><div class="notification-copy"><b>'+safeNotification(item.title)+'</b><p>'+safeNotification(item.body||"")+'</p><small>'+safeNotification(date)+'</small></div><div class="notification-actions">'+(item.related_id?'<a class="btn btn-outline" href="interests.html">Interest பார்க்க</a> ':'')+(item.is_read?'<span class="notification-read-label">படித்தது</span>':'<button class="btn btn-primary" type="button" data-mark-notification="'+item.id+'">படித்ததாகக் குறி</button>')+'</div></article>';
+   return '<article class="notification-row '+(item.is_read?'read':'unread')+'" data-notification-row="'+item.id+'"><div class="notification-copy"><b>'+safeNotification(item.title)+'</b><p>'+safeNotification(item.body||"")+'</p><small>'+safeNotification(date)+'</small></div><div class="notification-actions">'+(item.notification_type==="message_received"?'<a class="btn btn-outline" href="messages.html">செய்தியைப் பார்க்க</a> ':item.related_id?'<a class="btn btn-outline" href="interests.html">Interest பார்க்க</a> ':'')+(item.is_read?'<span class="notification-read-label">படித்தது</span>':'<button class="btn btn-primary" type="button" data-mark-notification="'+item.id+'">படித்ததாகக் குறி</button>')+'</div></article>';
   }).join(""):'<p class="notification-empty">இன்னும் அறிவிப்புகள் இல்லை.</p>';
   $("markAllNotificationsRead").hidden=unread===0;
   message("உங்கள் அறிவிப்புகள் புதுப்பிக்கப்பட்டன.");
