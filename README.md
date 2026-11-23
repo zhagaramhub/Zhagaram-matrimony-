@@ -30,7 +30,7 @@ The database uses RLS policies for member-owned records, role-protected admin/ow
 
 ## Deployment
 1. Keep the repository published through GitHub Pages.
-2. In Supabase Authentication, configure the production Site URL and allowed redirect URLs for the GitHub Pages project path, including the password-reset page.
+2. In Supabase Authentication, configure the production Site URL and allowed redirect URLs for the GitHub Pages project path, including profile.html (email confirmation) and reset-password.html.
 3. Enable the authentication methods that the site should offer. Mobile OTP requires a working phone provider and SMS configuration.
 4. Keep the database migrations and Storage policies applied to the linked Supabase project.
 5. After changing the app shell, increment the cache name in sw.js so installed clients receive the new assets.
