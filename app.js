@@ -745,7 +745,7 @@ if(notificationsPage){
   $("notificationUnreadCount").textContent=unread+" படிக்காத அறிவிப்புகள்";
   $("notificationRows").innerHTML=items.length?items.map(item=>{
    const date=new Date(item.created_at).toLocaleString("ta-IN");
-   return '<article class="notification-row '+(item.is_read?'read':'unread')+'" data-notification-row="'+item.id+'"><div class="notification-copy"><b>'+safeNotification(item.title)+'</b><p>'+safeNotification(item.body||"")+'</p><small>'+safeNotification(date)+'</small></div><div class="notification-actions">'+(item.notification_type==="message_received"?'<a class="btn btn-outline" href="messages.html">செய்தியைப் பார்க்க</a> ':item.related_id?'<a class="btn btn-outline" href="interests.html">Interest பார்க்க</a> ':'')+(item.is_read?'<span class="notification-read-label">படித்தது</span>':'<button class="btn btn-primary" type="button" data-mark-notification="'+item.id+'">படித்ததாகக் குறி</button>')+'</div></article>';
+   return '<article class="notification-row '+(item.is_read?'read':'unread')+'" data-notification-row="'+item.id+'"><div class="notification-copy"><b>'+safeNotification(item.title)+'</b><p>'+safeNotification(item.body||"")+'</p><small>'+safeNotification(date)+'</small></div><div class="notification-actions">'+(item.notification_type==="message_received"?'<a class="btn btn-outline" href="messages.html">செய்தியைப் பார்க்க</a> ':item.notification_type==="profile_report_update"&&item.related_id?'<a class="btn btn-outline" href="my-reports.html?id='+encodeURIComponent(item.related_id)+'">புகார் விவரம் பார்க்க</a> ':item.related_id?'<a class="btn btn-outline" href="interests.html">Interest பார்க்க</a> ':'')+(item.is_read?'<span class="notification-read-label">படித்தது</span>':'<button class="btn btn-primary" type="button" data-mark-notification="'+item.id+'">படித்ததாகக் குறி</button>')+'</div></article>';
   }).join(""):'<p class="notification-empty">இன்னும் அறிவிப்புகள் இல்லை.</p>';
   $("markAllNotificationsRead").hidden=unread===0;
   message("உங்கள் அறிவிப்புகள் புதுப்பிக்கப்பட்டன.");
@@ -776,6 +776,27 @@ if(notificationsPage){
   }catch(error){message(error.message||"அனைத்தையும் படித்ததாகக் குறிக்க முடியவில்லை.",true);}
   finally{button.disabled=false;}
  });
+}
+
+
+// Member report history: members can only read their own reports through RLS.
+const myReportsPage=$("myReportsList");
+if(myReportsPage){
+ const safeReport=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+ const reasonLabels={fake_profile:"போலியான Profile",false_information:"தவறான தகவல்கள்",inappropriate_photo:"தவறான புகைப்படம்",misconduct:"தவறான நடத்தை",scam_attempt:"ஏமாற்று முயற்சி",other:"மற்றவை"};
+ const statusLabels={pending:"புதிய புகார்",reviewing:"விசாரணையில்",resolved:"தீர்வு காணப்பட்டது",dismissed:"நிராகரிக்கப்பட்டது"};
+ const loadMyReports=async()=>{
+  const {data:{user},error:userError}=await supabase.auth.getUser();
+  if(userError)throw userError;
+  if(!user){location.href="login.html";return;}
+  let query=supabase.from("profile_reports").select("id,reported_name,reported_member_id,reason,details,status,admin_note,created_at,reviewed_at").eq("reporter_id",user.id).order("created_at",{ascending:false}).limit(100);
+  const reportId=new URLSearchParams(location.search).get("id");
+  if(reportId)query=query.eq("id",reportId);
+  const {data,error}=await query;
+  if(error)throw error;
+  $("myReportsRows").innerHTML=data&&data.length?data.map(item=>'<article class="my-report-item"><div class="my-report-head"><b>'+safeReport(item.reported_name)+' · '+safeReport(item.reported_member_id)+'</b><span class="my-report-status '+safeReport(item.status)+'">'+safeReport(statusLabels[item.status]||item.status)+'</span></div><p><b>காரணம்:</b> '+safeReport(reasonLabels[item.reason]||item.reason)+'</p>'+(item.details?'<p>'+safeReport(item.details)+'</p>':'')+(item.admin_note?'<div class="my-report-note"><b>Admin குறிப்பு:</b> '+safeReport(item.admin_note)+'</div>':'')+'<small>'+safeReport(new Date(item.created_at).toLocaleString("ta-IN"))+'</small></article>').join(""):'<p class="notification-empty">இந்தப் புகார் விவரம் கிடைக்கவில்லை.</p>';
+ };
+ loadMyReports().catch(error=>{const el=$("myReportsMessage");if(el){el.textContent=error.message||"புகார் விவரங்களை ஏற்ற முடியவில்லை.";el.classList.add("error");}});
 }
 
 // Public member detail view. Only approved public fields are queried; private contacts are never selected.
