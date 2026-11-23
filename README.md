@@ -1,19 +1,43 @@
 # Zhagaram Matrimony
 
-Tamil + English responsive matrimonial website starter.
+Tamil + English matrimonial web app built with HTML, CSS, JavaScript, Supabase Auth, PostgreSQL and Supabase Storage.
 
-## Current status
-- Responsive homepage and navigation
-- Sample profile cards (not real member data)
-- Front-end profile search filters
-- Free and Premium membership introduction
-- Login and registration are clearly marked as coming soon
+## Live website
+https://zhagaramhub.github.io/Zhagaram-matrimony-/
 
-## Run
-Open `index.html` in a browser, or publish the repository with GitHub Pages.
+## Implemented features
+- Email registration, email/password login and password reset
+- Member profile creation and editing, family details and private profile-photo storage
+- Member IDs and profile approval / rejection / suspension workflow
+- Admin verification badges with verification history
+- Profile search and Smart Match recommendations based on saved preferences
+- Send / receive / accept / reject interests
+- Private member chat with photo attachments after an accepted interest
+- In-app notifications and live Supabase Realtime updates
+- Member favourites and profile reporting
+- Admin report review and reporter status notifications
+- Owner tools for admin/staff role assignment and staff task management
+- Staff task status updates
+- Responsive layout and installable PWA shell
 
-## Supabase
-Supabase authentication, database, private profile details, photo storage, and row-level security are **not yet configured in this starter**. Do not add a Supabase service-role key to frontend files. The public anon/publishable key can be added later with suitable Row Level Security policies.
+## Supabase configuration
+The browser app uses the Supabase project URL and publishable key in app.js and reset-password.js. A publishable key is intended for browser use when Row Level Security (RLS) is correctly configured.
 
-## Important
-All displayed profiles are sample placeholders. No real user data or payments are processed yet.
+Never put a Supabase service_role key, secret API key, VAPID private key, webhook secret or other server secret in frontend files or GitHub. Server secrets belong only in protected Supabase Edge Function environment variables.
+
+The database uses RLS policies for member-owned records, role-protected admin/owner operations, private profile details, match preferences, reports, messages, notifications and push-subscription records. Profile and chat photo buckets are private and have access policies.
+
+## Deployment
+1. Keep the repository published through GitHub Pages.
+2. In Supabase Authentication, configure the production Site URL and allowed redirect URLs for the GitHub Pages project path, including the password-reset page.
+3. Enable the authentication methods that the site should offer. Mobile OTP requires a working phone provider and SMS configuration.
+4. Keep the database migrations and Storage policies applied to the linked Supabase project.
+5. After changing the app shell, increment the cache name in sw.js so installed clients receive the new assets.
+
+## Not yet enabled
+- Android/browser push delivery is paused. The subscription table and Edge Function exist, but the required protected webhook secret and database webhook are not configured.
+- Membership plans are informational; payment gateway checkout and subscription billing are not connected.
+- Mobile OTP is displayed in the login UI but requires the Supabase phone provider and SMS service to be configured.
+
+## Final testing
+Before public launch, test with separate member, admin, owner and staff accounts. Verify registration and email confirmation, password reset, profile privacy, photo permissions, profile review, interests, chat access, notification delivery, reports, Smart Matches, role restrictions and mobile layouts. Use realistic adult test profiles; do not use underage or future birth dates.
