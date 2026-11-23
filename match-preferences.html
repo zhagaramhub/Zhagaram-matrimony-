@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f7f4ed"><meta name="description" content="Set your Zhagaram Matrimony match preferences.">
+<title>Match Preferences | Zhagaram Matrimony</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Noto+Sans+Tamil:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+.preferences-wrap{width:min(760px,calc(100% - 32px));margin:28px auto 64px;background:#fff;border:1px solid #e9e4d8;border-radius:18px;padding:clamp(18px,4vw,32px);box-shadow:0 12px 36px #183b2b0b}
+.preferences-wrap h2{margin:0 0 8px;color:#173c32}.preferences-intro{color:#746e63;line-height:1.7;margin:0 0 22px}
+.preferences-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.preferences-form label{display:grid;gap:7px;font-size:13px;font-weight:700;color:#514b42}
+.preferences-form input,.preferences-form select{width:100%;min-height:44px;border:1px solid #ded9ce;border-radius:9px;padding:9px 11px;background:#fff;color:#263b32;font:inherit;font-size:14px}
+.preferences-form .wide{grid-column:1/-1}.preferences-form button{grid-column:1/-1;margin-top:8px}
+.preferences-note{font-size:12px;color:#81796d;line-height:1.6;margin-top:16px}
+@media(max-width:560px){.preferences-form{grid-template-columns:1fr}.preferences-form .wide{grid-column:auto}}
+</style>
+</head>
+<body>
+<header class="site-header">
+<a class="brand" href="dashboard.html"><span class="brand-mark">ழ</span><span><b>Zhagaram</b><small>MATRIMONY</small></span></a>
+<a class="profile-top-link" href="dashboard.html">← Dashboard</a>
+</header>
+<main>
+<section class="page-hero compact-hero"><span class="section-kicker">SMART MATCHMAKING</span><h1>உங்கள் துணை விருப்பங்கள்</h1><p>உங்களுக்கு ஏற்ற Profile-களைப் பரிந்துரைக்க உங்கள் விருப்பங்களை அமைக்கவும்.</p></section>
+<section class="preferences-wrap">
+<h2>Match Preferences</h2>
+<p class="preferences-intro">நீங்கள் தேர்வு செய்யும் விவரங்கள் பொருத்தமான Profile-களைத் தேட மட்டுமே பயன்படுத்தப்படும். தேவையில்லாதவற்றை காலியாக விடலாம்.</p>
+<form id="matchPreferencesForm" class="preferences-form">
+<label>தேடும் பாலினம்<select id="prefLookingFor"><option value="">எதுவாக இருந்தாலும்</option><option value="female">மணமகள்</option><option value="male">மணமகன்</option></select></label>
+<label>திருமண நிலை<select id="prefMaritalStatus"><option value="">எதுவாக இருந்தாலும்</option><option value="never_married">திருமணம் ஆகாதவர்</option><option value="divorced">விவாகரத்து பெற்றவர்</option><option value="widowed">துணையை இழந்தவர்</option><option value="awaiting_divorce">விவாகரத்து நடைமுறையில்</option></select></label>
+<label>குறைந்தபட்ச வயது<input id="prefMinAge" type="number" min="18" max="100" inputmode="numeric" placeholder="உதா: 24"></label>
+<label>அதிகபட்ச வயது<input id="prefMaxAge" type="number" min="18" max="100" inputmode="numeric" placeholder="உதா: 30"></label>
+<label>குறைந்தபட்ச உயரம் (செ.மீ.)<input id="prefMinHeight" type="number" min="90" max="250" inputmode="numeric" placeholder="விருப்பம்"></label>
+<label>அதிகபட்ச உயரம் (செ.மீ.)<input id="prefMaxHeight" type="number" min="90" max="250" inputmode="numeric" placeholder="விருப்பம்"></label>
+<label>மதம்<input id="prefReligion" maxlength="60" placeholder="உதா: Hindu"></label>
+<label>சமூகம்<input id="prefCommunity" maxlength="100"></label>
+<label>உள் சமூகம்<input id="prefSubCommunity" maxlength="100"></label>
+<label>நகரம்<input id="prefCity" maxlength="100"></label>
+<label>மாவட்டம்<input id="prefDistrict" maxlength="100"></label>
+<label>மாநிலம்<input id="prefState" maxlength="100" placeholder="உதா: Tamil Nadu"></label>
+<button class="btn btn-primary" id="saveMatchPreferences" type="submit">விருப்பங்களைச் சேமிக்கவும்</button>
+</form>
+<p class="auth-message" id="matchPreferencesMessage" role="status" aria-live="polite"></p>
+<p class="preferences-note">தனியுரிமை: உங்கள் விருப்பங்களை நீங்கள் மட்டுமே பார்க்கவும் மாற்றவும் முடியும். இவை உங்கள் பொதுச் Profile விவரங்களை மாற்றாது.</p>
+</section>
+</main>
+<footer><a class="brand footer-brand" href="dashboard.html"><span class="brand-mark">ழ</span><span><b>Zhagaram</b><small>MATRIMONY</small></span></a><p>Respect · Trust · Privacy</p><small>© <span id="year"></span> Zhagaram Matrimony. All rights reserved.</small></footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="app.js"></script>
+</body></html>
