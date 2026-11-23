@@ -205,7 +205,7 @@ document.querySelectorAll("#mainNav a").forEach(a=>a.addEventListener("click",()
 let liveSearchProfiles=[];
 const searchEscape=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
 const profileAge=value=>{if(!value)return null;const birth=new Date(value+"T00:00:00");if(Number.isNaN(birth.getTime()))return null;const today=new Date();let age=today.getFullYear()-birth.getFullYear();const beforeBirthday=today.getMonth()<birth.getMonth()||(today.getMonth()===birth.getMonth()&&today.getDate()<birth.getDate());if(beforeBirthday)age--;return age>=18&&age<=100?age:null};
-const profileMarriageAgeEligible=profile=>{const age=profileAge(profile?.date_of_birth);return age!==null&&age>=(profile?.gender==="male"?21:18)};
+const profileMarriageAgeEligible=profile=>{const age=profileAge(profile?.date_of_birth);return ["male","female","other","prefer_not_to_say"].includes(profile?.gender)&&age!==null&&age>=(profile.gender==="male"?21:18)};
 const updateDateOfBirthMax=()=>{const input=$("dateOfBirth");if(!input)return;const minimumAge=$("gender")?.value==="male"?21:18;const today=new Date();const cutoff=new Date(today.getFullYear()-minimumAge,today.getMonth(),today.getDate());input.max=[cutoff.getFullYear(),String(cutoff.getMonth()+1).padStart(2,"0"),String(cutoff.getDate()).padStart(2,"0")].join("-")};
 if($("gender"))$("gender").addEventListener("change",updateDateOfBirthMax);
 updateDateOfBirthMax();
