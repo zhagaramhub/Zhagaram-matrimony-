@@ -250,6 +250,7 @@ const loadLiveProfiles=async()=>{
  const status=$("searchMessage");if(!status)return;
  try{const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;
   if(!user){status.innerHTML='உறுப்பினர் Profiles பார்க்க <a href="login.html">உள்நுழையுங்கள்</a>.';return}
+  const {data:viewerProfile,error:viewerError}=await supabase.from("profiles").select("date_of_birth,gender").eq("id",user.id).maybeSingle();if(viewerError)throw viewerError;if(!profileMarriageAgeEligible(viewerProfile)){status.hidden=false;status.innerHTML='Search செய்ய உங்கள் Profile-ல் சரியான பிறந்த தேதி மற்றும் சட்ட வயது இருக்க வேண்டும். <a href="profile.html">Profile-ஐத் திருத்துங்கள்</a>.';return}
   const {data,error}=await supabase.from("profiles").select("id,member_id,full_name,date_of_birth,gender,religion,community,sub_community,education,occupation,height_cm,marital_status,city,district,state,is_verified").eq("profile_status","active").order("created_at",{ascending:false}).limit(100);
   if(error)throw error;liveSearchProfiles=data||[];status.hidden=true;renderLiveProfiles();let preferences=null;const preferenceResult=await supabase.from("match_preferences").select("*").eq("user_id",user.id).maybeSingle();if(preferenceResult.error){console.error("Match preferences load error:",preferenceResult.error);renderSmartMatches(null,user.id);$("smartMatchEmpty").textContent="Match Preferences ஏற்ற முடியவில்லை. மீண்டும் உள்நுழைந்து முயற்சிக்கவும்.";}else{preferences=preferenceResult.data;renderSmartMatches(preferences,user.id);}
   if($("emptyState")&&liveSearchProfiles.length===0){$("emptyState").textContent="இன்னும் அங்கீகரிக்கப்பட்ட Profiles இல்லை.";$("emptyState").hidden=false}
@@ -678,6 +679,9 @@ if (messagesPage) {
       const {data:{user},error:userError}=await supabase.auth.getUser();
       if(userError) throw userError;
       if(!user){location.href="login.html";return;}
+      const {data:viewerProfile,error:viewerError}=await supabase.from("profiles").select("date_of_birth,gender").eq("id",user.id).maybeSingle();
+      if(viewerError)throw viewerError;
+      if(!profileMarriageAgeEligible(viewerProfile)){chatNotice("Chat பயன்படுத்த உங்கள் Profile-ல் சரியான பிறந்த தேதி மற்றும் சட்ட வயது இருக்க வேண்டும். Profile-ஐத் திருத்துங்கள்.",true);$("chatComposer").hidden=true;return;}
       chatUser=user;
       const {data:requests,error}=await supabase.from("interest_requests")
         .select("sender_id,receiver_id,created_at")
@@ -897,6 +901,9 @@ if (detailPage) {
       const {data:{user},error:userError} = await supabase.auth.getUser();
       if (userError) throw userError;
       if (!user) { message.innerHTML = 'Profile பார்க்க <a href="login.html">உள்நுழையுங்கள்</a>.'; return; }
+      const {data:viewerProfile,error:viewerError}=await supabase.from("profiles").select("date_of_birth,gender").eq("id",user.id).maybeSingle();
+      if(viewerError)throw viewerError;
+      if(!profileMarriageAgeEligible(viewerProfile))throw new Error("பிற உறுப்பினர்களின் Profile-களைப் பார்க்க உங்கள் Profile-ல் சரியான பிறந்த தேதி மற்றும் சட்ட வயது இருக்க வேண்டும். Profile-ஐத் திருத்துங்கள்.");
       const id = new URLSearchParams(location.search).get("id");
       if (!id) throw new Error("Profile அடையாளம் கிடைக்கவில்லை.");
       const {data:p,error} = await supabase.from("profiles")
