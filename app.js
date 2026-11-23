@@ -377,6 +377,57 @@ if (adminPage) {
       return '<div class="audit-item"><div><b>' + change + '</b><small>' + member + ' · ' + actor + ' · ' + safeText(when) + '</small></div><span class="audit-change">Badge History</span></div>';
     }).join("") : '<p class="table-empty">இதுவரை Verified Badge மாற்றங்கள் எதுவும் இல்லை.</p>';
   };
+  const reportReasonLabels = {
+    fake_profile: "போலியான Profile",
+    false_information: "தவறான தகவல்கள்",
+    inappropriate_photo: "தவறான புகைப்படம்",
+    misconduct: "தவறான நடத்தை",
+    scam_attempt: "ஏமாற்று முயற்சி",
+    other: "மற்றவை"
+  };
+  const reportStatusLabels = {
+    pending: "புதிய Report",
+    reviewing: "விசாரணையில்",
+    resolved: "தீர்வு காணப்பட்டது",
+    dismissed: "நிராகரிக்கப்பட்டது"
+  };
+  const loadProfileReports = async () => {
+    const {data,error} = await supabase.rpc("get_admin_profile_reports",{p_limit:100});
+    if (error) throw error;
+    const el = $("profileReportRows");
+    el.innerHTML = data && data.length ? data.map(item => {
+      const details = item.details ? '<p class="profile-report-details">' + safeText(item.details) + '</p>' : "";
+      const note = safeText(item.admin_note || "");
+      return '<article class="profile-report-item" data-report-id="' + safeText(item.id) + '">' +
+        '<div class="profile-report-top"><div><b>' + safeText(item.reported_name) + ' · ' + safeText(item.reported_member_id) + '</b>' +
+        '<small>Report செய்தவர்: ' + safeText(item.reporter_name || "உறுப்பினர்") + ' · ' + safeText(item.reporter_member_id || "—") + '</small></div>' +
+        '<span class="status-pill ' + safeText(item.status) + '">' + safeText(reportStatusLabels[item.status] || item.status) + '</span></div>' +
+        '<p class="profile-report-reason">காரணம்: ' + safeText(reportReasonLabels[item.reason] || item.reason) + '</p>' + details +
+        '<small class="profile-report-date">' + safeText(new Date(item.created_at).toLocaleString(zhLanguage==="ta"?"ta-IN":"en-IN",{year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"})) + '</small>' +
+        '<label class="profile-report-note-label">Admin குறிப்பு<textarea data-report-note maxlength="1000" rows="2" placeholder="நடவடிக்கை குறிப்பு (விருப்பம்)">' + note + '</textarea></label>' +
+        '<div class="action-group"><button class="action-btn action-suspend" data-report-status="reviewing">விசாரணையில்</button><button class="action-btn action-approve" data-report-status="resolved">தீர்வு</button><button class="action-btn action-reject" data-report-status="dismissed">நிராகரி</button></div>' +
+        '</article>';
+    }).join("") : '<p class="table-empty">புதிய Profile Report எதுவும் இல்லை.</p>';
+  };
+  const updateProfileReport = async (row, nextStatus, button) => {
+    if (!row || !nextStatus) return;
+    if (!confirm("இந்த Report-ன் நிலையை “" + (reportStatusLabels[nextStatus] || nextStatus) + "” என மாற்றவா?")) return;
+    button.disabled = true;
+    try {
+      const note = row.querySelector("[data-report-note]")?.value || "";
+      const {data,error} = await supabase.rpc("review_profile_report",{
+        p_report_id:row.dataset.reportId,
+        p_status:nextStatus,
+        p_admin_note:note
+      });
+      if (error) throw error;
+      if (!data) throw new Error("Report புதுப்பிக்க முடியவில்லை.");
+      toast("Profile Report புதுப்பிக்கப்பட்டது.");
+      await loadProfileReports();
+    } catch (error) {
+      showAdminMessage(error.message || "Report புதுப்பிக்க முடியவில்லை.", "error");
+    } finally { button.disabled = false; }
+  };
   const updateVerification = async (row, nextValue, button) => {
     if (!confirm(nextValue === "true" ? "இந்த உறுப்பினரின் விவரங்களைச் சரிபார்த்து Verified Badge வழங்கவா?" : "Verified Badge-ஐ நீக்கவா?")) return;
     button.disabled = true;
@@ -411,7 +462,7 @@ if (adminPage) {
     try {
       const user = await requireAdmin();
       if (!user) return;
-      await Promise.all([loadMembers(),loadAudit(),loadVerificationAudit()]);
+      await Promise.all([loadMembers(),loadAudit(),loadVerificationAudit(),loadProfileReports()]);
     } catch (error) {
       showAdminMessage(error.message || "Admin Dashboard ஏற்றப்படவில்லை.", "error");
     }
@@ -428,6 +479,13 @@ if (adminPage) {
     if (!row) return;
     if (button.hasAttribute("data-verify")) updateVerification(row,button.dataset.verify,button);
     else updateMemberStatus(row,button.dataset.status,button);
+  });
+  $("refreshProfileReports")?.addEventListener("click",()=>loadProfileReports().catch(e=>showAdminMessage(e.message,"error")));
+  $("profileReportRows")?.addEventListener("click",event => {
+    const button = event.target.closest("button[data-report-status]");
+    if (!button) return;
+    const row = button.closest("[data-report-id]");
+    updateProfileReport(row,button.dataset.reportStatus,button);
   });
   $("adminLogout")?.addEventListener("click",logout);
 }
@@ -761,6 +819,40 @@ if (detailPage) {
           }catch(sendError){
             $("interestActionMessage").textContent=sendError.code==="23505"?"ஏற்கனவே Interest பதிவு உள்ளது.":(sendError.message||"அனுப்ப முடியவில்லை.");
             interestButton.disabled=false;
+          }
+        });
+      }
+
+      const reportButton = $("reportProfileButton");
+      const reportWrap = $("profileReportFormWrap");
+      const reportForm = $("profileReportForm");
+      if (user.id !== id && reportButton && reportForm) {
+        reportButton.hidden = false;
+        reportButton.addEventListener("click", () => { reportWrap.hidden = !reportWrap.hidden; });
+        reportForm.addEventListener("submit", async event => {
+          event.preventDefault();
+          const submit = $("submitProfileReport");
+          const status = $("reportActionMessage");
+          submit.disabled = true;
+          status.textContent = "Report அனுப்பப்படுகிறது...";
+          try {
+            const {error:reportError} = await supabase.rpc("submit_profile_report", {
+              p_reported_profile_id: id,
+              p_reason: $("reportReason").value,
+              p_details: $("reportDetails").value.trim() || null
+            });
+            if (reportError) throw reportError;
+            reportForm.reset();
+            reportWrap.hidden = true;
+            reportButton.disabled = true;
+            reportButton.textContent = "✓ Report அனுப்பப்பட்டது";
+            status.textContent = "உங்கள் Report பாதுகாப்பாக Admin-க்கு அனுப்பப்பட்டது. நன்றி.";
+          } catch (reportError) {
+            status.textContent = reportError.code === "23505"
+              ? "இந்த Profile குறித்து ஏற்கனவே ஒரு Report நிலுவையில் உள்ளது."
+              : (reportError.message || "Report அனுப்ப முடியவில்லை. மீண்டும் முயற்சிக்கவும்.");
+          } finally {
+            submit.disabled = false;
           }
         });
       }

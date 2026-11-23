@@ -39,3 +39,19 @@
 
 .verification-audit-panel .audit-change{color:#28613b}
 .verification-audit-panel .audit-item{padding:14px 2px}
+
+.profile-report-list{display:grid;gap:12px}
+.profile-report-item{border:1px solid #eee8d9;border-radius:12px;padding:16px;background:#fffefa}
+.profile-report-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.profile-report-top b,.profile-report-top small{display:block}
+.profile-report-top b{font-size:13px;color:#173b31}
+.profile-report-top small,.profile-report-date{font-size:10px;color:#938978;margin-top:5px}
+.profile-report-reason{font-size:12px;font-weight:800;color:#80683b;margin:12px 0 6px}
+.profile-report-details{font-size:12px;line-height:1.7;color:#58665c;white-space:pre-wrap;overflow-wrap:anywhere}
+.profile-report-note-label{display:grid;gap:6px;margin:12px 0;color:#786e5d;font-size:11px;font-weight:700}
+.profile-report-note-label textarea{width:100%;box-sizing:border-box;border:1px solid #e5dfd2;border-radius:8px;padding:10px;font:12px "Noto Sans Tamil",sans-serif;resize:vertical}
+.profile-report-item .action-group{margin-top:10px}
+.status-pill.reviewing{background:#f4efe2;color:#856a30}
+.status-pill.resolved{background:#eaf5ed;color:#28613b}
+.status-pill.dismissed{background:#fff0ed;color:#a44739}
+@media(max-width:520px){.profile-report-top{flex-direction:column}.profile-report-item{padding:13px}}

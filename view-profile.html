@@ -29,6 +29,15 @@
 .profile-card:focus-visible{outline:3px solid #c6a35e;outline-offset:3px}
 @media(max-width:520px){.profile-detail-top{align-items:flex-start}.profile-detail-avatar{width:68px;height:68px;flex-basis:68px;border-radius:18px;font-size:30px}}
  .interest-action-wrap{margin-top:22px}.interest-action-wrap button{cursor:pointer}.interest-action-wrap p{color:#65756e;font-size:13px}
+.profile-report-wrap{margin-top:18px;padding-top:18px;border-top:1px solid #eee8dc}
+.profile-report-button{border:1px solid #d8cbb0;background:#fbf7ed;color:#80683b;border-radius:5px;padding:11px 15px;font:700 12px "Noto Sans Tamil",sans-serif;cursor:pointer;min-height:44px}
+.profile-report-form{display:grid;gap:12px;margin-top:14px;padding:16px;border:1px solid #eee5d4;border-radius:10px;background:#fbfaf6}
+.profile-report-form label{display:grid;gap:6px;color:#53675b;font-size:12px;font-weight:700}
+.profile-report-form select,.profile-report-form textarea{width:100%;border:1px solid #ded8ca;border-radius:6px;padding:11px;background:#fffefa;color:#293b35;font:12px "Noto Sans Tamil",sans-serif}
+.profile-report-form textarea{resize:vertical;min-height:86px}
+.profile-report-form button{min-height:44px;cursor:pointer}
+.profile-report-form p{font-size:12px;color:#65756e;line-height:1.7}
+
 </style>
 </head>
 <body>
@@ -46,6 +55,29 @@
 <div class="profile-detail-top"><div class="profile-detail-avatar" id="detailAvatar">ழ</div><img class="profile-detail-photo" id="detailPhoto" alt="உறுப்பினர் புகைப்படம்" hidden><div><span class="profile-detail-id" id="detailMemberId"></span><h1 id="detailName"></h1><span id="detailVerifiedBadge" class="verified-badge" hidden>✓ சரிபார்க்கப்பட்ட சுயவிவரம்</span><p id="detailSummary"></p></div></div>
 <div class="profile-detail-grid" id="detailGrid"></div>
 <div class="interest-action-wrap"><button class="btn btn-primary" id="sendInterestButton" type="button" hidden>♡ Interest தெரிவிக்கவும்</button><p id="interestActionMessage" role="status"></p></div>
+<div class="profile-report-wrap">
+  <button class="profile-report-button" id="reportProfileButton" type="button" hidden>⚑ இந்த Profile-ஐ Report செய்க</button>
+  <div id="profileReportFormWrap" hidden>
+    <form class="profile-report-form" id="profileReportForm">
+      <label>Report காரணம்
+        <select id="reportReason" required>
+          <option value="">காரணத்தைத் தேர்ந்தெடுக்கவும்</option>
+          <option value="fake_profile">போலியான Profile</option>
+          <option value="false_information">தவறான தகவல்கள்</option>
+          <option value="inappropriate_photo">தவறான புகைப்படம்</option>
+          <option value="misconduct">தவறான நடத்தை</option>
+          <option value="scam_attempt">ஏமாற்று முயற்சி</option>
+          <option value="other">மற்றவை</option>
+        </select>
+      </label>
+      <label>கூடுதல் விவரம் (விருப்பம்)
+        <textarea id="reportDetails" maxlength="1000" rows="3" placeholder="பிரச்சினையைச் சுருக்கமாக எழுதுங்கள்"></textarea>
+      </label>
+      <button class="btn btn-primary" id="submitProfileReport" type="submit">Report அனுப்பவும்</button>
+      <p id="reportActionMessage" role="status"></p>
+    </form>
+  </div>
+</div>
 <p class="profile-detail-note">தனியுரிமைக்காக கைபேசி எண், மின்னஞ்சல் மற்றும் வருமான விவரங்கள் இந்தப் பக்கத்தில் காட்டப்படாது.</p>
 </div>
 <a class="btn btn-primary" href="search.html" style="margin-top:22px;display:inline-flex">← தேடலுக்குத் திரும்பு</a>
