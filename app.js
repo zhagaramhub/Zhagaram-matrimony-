@@ -340,6 +340,55 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   });
 }
 
+const ZHAGARAM_PUSH_PUBLIC_KEY = "BMiHgEBp1_cRzVLQJoSz6tGYSq4Nt44HflK87NTKEweSmPYK75k5QVGzBQM0L2jLD-unL8o0VztB8DFM3yswLOY";
+function pushKeyBytes(value) {
+  const padding = "=".repeat((4 - value.length % 4) % 4);
+  const raw = atob((value + padding).replace(/-/g, "+").replace(/_/g, "/"));
+  return Uint8Array.from(raw, character => character.charCodeAt(0));
+}
+async function enableZhagaramPush(userId) {
+  if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+    throw new Error("இந்த Browser-ல் Push Notification வசதி ஆதரிக்கப்படவில்லை. Chrome-ல் திறந்து முயற்சிக்கவும்.");
+  }
+  const permission = await Notification.requestPermission();
+  if (permission !== "granted") throw new Error("Notification அனுமதி வழங்கப்படவில்லை. Browser Settings-ல் அனுமதிக்கவும்.");
+  const registration = await navigator.serviceWorker.register("./sw.js");
+  await navigator.serviceWorker.ready;
+  let subscription = await registration.pushManager.getSubscription();
+  if (!subscription) {
+    subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: pushKeyBytes(ZHAGARAM_PUSH_PUBLIC_KEY)
+    });
+  }
+  const { error } = await supabase.from("push_subscriptions").upsert({
+    user_id: userId,
+    endpoint: subscription.endpoint,
+    subscription: subscription.toJSON()
+  }, { onConflict: "endpoint" });
+  if (error) throw error;
+  return true;
+}
+const enablePushButton = $("enablePushNotifications");
+if (enablePushButton) {
+  enablePushButton.addEventListener("click", async () => {
+    enablePushButton.disabled = true;
+    const originalText = enablePushButton.textContent;
+    enablePushButton.textContent = "அமைக்கப்படுகிறது...";
+    try {
+      const user = await getUser();
+      if (!user) return;
+      await enableZhagaramPush(user.id);
+      enablePushButton.textContent = "✓ Notifications இயக்கப்பட்டன";
+      toast("Push Notifications இயக்கப்பட்டன");
+    } catch (error) {
+      enablePushButton.disabled = false;
+      enablePushButton.textContent = originalText;
+      toast(error.message || "Notification அமைக்க முடியவில்லை");
+    }
+  });
+}
+
 
 // Secure administrator dashboard: role is verified from the database, never from user metadata.
 const adminPage = $("memberRows");
