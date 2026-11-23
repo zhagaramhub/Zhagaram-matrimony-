@@ -981,3 +981,79 @@ if (detailPage) {
     }
   })();
 }
+
+
+// Member-owned matchmaking preferences.
+if ($("matchPreferencesForm")) {
+  (async () => {
+    const form = $("matchPreferencesForm");
+    const messageId = "matchPreferencesMessage";
+    const fields = {
+      looking_for: "prefLookingFor",
+      marital_status: "prefMaritalStatus",
+      min_age: "prefMinAge",
+      max_age: "prefMaxAge",
+      min_height_cm: "prefMinHeight",
+      max_height_cm: "prefMaxHeight",
+      religion: "prefReligion",
+      community: "prefCommunity",
+      sub_community: "prefSubCommunity",
+      city: "prefCity",
+      district: "prefDistrict",
+      state: "prefState"
+    };
+    const numericFields = new Set(["min_age","max_age","min_height_cm","max_height_cm"]);
+    try {
+      const user = await getUser();
+      if (!user) {
+        setMessage(messageId, "இந்த வசதியைப் பயன்படுத்த முதலில் உள்நுழையுங்கள்.", true);
+        form.querySelectorAll("input,select,button").forEach(el => el.disabled = true);
+        return;
+      }
+      const { data, error } = await supabase.from("match_preferences")
+        .select("*").eq("user_id", user.id).maybeSingle();
+      if (error) throw error;
+      if (data) {
+        for (const [column, id] of Object.entries(fields)) {
+          const el = $(id);
+          if (el) el.value = data[column] ?? "";
+        }
+      } else {
+        const { data: ownProfile } = await supabase.from("profiles")
+          .select("gender,state").eq("id", user.id).maybeSingle();
+        if (ownProfile?.gender === "male") $("prefLookingFor").value = "female";
+        else if (ownProfile?.gender === "female") $("prefLookingFor").value = "male";
+        if (ownProfile?.state) $("prefState").value = ownProfile.state;
+      }
+    } catch (error) {
+      setMessage(messageId, error.message || "விருப்பங்களை ஏற்ற முடியவில்லை.", true);
+    }
+    form.addEventListener("submit", async event => {
+      event.preventDefault();
+      const button = $("saveMatchPreferences");
+      button.disabled = true;
+      setMessage(messageId, "சேமிக்கப்படுகிறது...");
+      try {
+        const user = await getUser();
+        if (!user) throw new Error("முதலில் உள்நுழையுங்கள்.");
+        const record = { user_id: user.id };
+        for (const [column, id] of Object.entries(fields)) {
+          const value = $(id).value.trim();
+          record[column] = numericFields.has(column) ? (value ? Number(value) : null) : (value || null);
+        }
+        if (record.min_age !== null && record.max_age !== null && record.min_age > record.max_age)
+          throw new Error("குறைந்தபட்ச வயது அதிகபட்ச வயதை விட அதிகமாக இருக்கக்கூடாது.");
+        if (record.min_height_cm !== null && record.max_height_cm !== null && record.min_height_cm > record.max_height_cm)
+          throw new Error("குறைந்தபட்ச உயரம் அதிகபட்ச உயரத்தை விட அதிகமாக இருக்கக்கூடாது.");
+        const { error } = await supabase.from("match_preferences").upsert(record, { onConflict: "user_id" });
+        if (error) throw error;
+        setMessage(messageId, "உங்கள் Match விருப்பங்கள் வெற்றிகரமாகச் சேமிக்கப்பட்டன.");
+        toast("Match Preferences saved");
+      } catch (error) {
+        setMessage(messageId, error.message || "சேமிக்க முடியவில்லை.", true);
+      } finally {
+        button.disabled = false;
+      }
+    });
+  })();
+}
