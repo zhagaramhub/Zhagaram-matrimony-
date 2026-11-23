@@ -779,6 +779,46 @@ if(notificationsPage){
 }
 
 
+
+// Member favourites: RLS restricts rows to the signed-in member.
+const favouritesPage=$("myFavouritesRows");
+if(favouritesPage){
+ const safeFavourite=value=>String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+ const loadFavourites=async()=>{
+  const {data:{user},error:userError}=await supabase.auth.getUser();
+  if(userError)throw userError;
+  if(!user){location.href="login.html";return;}
+  const {data:saved,error:savedError}=await supabase.from("profile_favourites").select("profile_id,created_at").eq("user_id",user.id).order("created_at",{ascending:false});
+  if(savedError)throw savedError;
+  const ids=(saved||[]).map(row=>row.profile_id);
+  if(!ids.length){favouritesPage.innerHTML='<p class="favourites-empty">இன்னும் Favourite Profile-கள் சேர்க்கப்படவில்லை.</p>';return;}
+  const {data:profiles,error}=await supabase.from("profiles").select("id,member_id,full_name,date_of_birth,gender,religion,education,occupation,city,district,state,is_verified").in("id",ids).eq("profile_status","active");
+  if(error)throw error;
+  const byId=new Map((profiles||[]).map(p=>[p.id,p]));
+  const ordered=ids.map(id=>byId.get(id)).filter(Boolean);
+  favouritesPage.innerHTML=ordered.length?ordered.map(p=>{
+   const name=safeFavourite(p.full_name||"Zhagaram Member");
+   const age=profileAge(p.date_of_birth);
+   const place=[p.city,p.district,p.state].filter(Boolean).map(safeFavourite).join(", ");
+   return '<article class="favourite-item"><a class="favourite-profile-link" href="view-profile.html?id='+encodeURIComponent(p.id)+'"><span class="favourite-initial">'+safeFavourite((p.full_name||"Z").trim().charAt(0).toUpperCase())+'</span><span class="favourite-copy"><b>'+name+(p.is_verified?' <span class="verified-badge">✓ சரிபார்க்கப்பட்டது</span>':'')+'</b><small>'+safeFavourite(p.member_id||"")+'</small><span>'+(age!==null?age+" வயது":"வயது விவரம் இல்லை")+(place?" · "+place:"")+'</span><small>'+safeFavourite([p.religion,p.education,p.occupation].filter(Boolean).join(" · "))+'</small></span></a><button type="button" class="favourite-remove" data-remove-favourite="'+p.id+'">★ நீக்கு</button></article>';
+  }).join(""):'<p class="favourites-empty">செயலில் உள்ள Favourite Profile-கள் இல்லை.</p>';
+ };
+ loadFavourites().catch(error=>{favouritesPage.innerHTML='<p class="favourites-empty">'+safeFavourite(error.message||"Favourite பட்டியலை ஏற்ற முடியவில்லை.")+'</p>';});
+ favouritesPage.addEventListener("click",async event=>{
+  const button=event.target.closest("button[data-remove-favourite]");
+  if(!button)return;
+  button.disabled=true;
+  try{
+   const {data:{user},error:userError}=await supabase.auth.getUser();
+   if(userError)throw userError;
+   if(!user)throw new Error("மீண்டும் உள்நுழையுங்கள்.");
+   const {error}=await supabase.from("profile_favourites").delete().eq("user_id",user.id).eq("profile_id",button.dataset.removeFavourite);
+   if(error)throw error;
+   await loadFavourites();
+  }catch(error){button.disabled=false;alert(error.message||"நீக்க முடியவில்லை.");}
+ });
+}
+
 // Member report history: members can only read their own reports through RLS.
 const myReportsPage=$("myReportsList");
 if(myReportsPage){
@@ -817,6 +857,39 @@ if (detailPage) {
         .eq("id",id).eq("profile_status","active").maybeSingle();
       if (error) throw error;
       if (!p) throw new Error("இந்த Profile கிடைக்கவில்லை அல்லது தற்போது கிடைக்கவில்லை.");
+
+      const favouriteButton = $("toggleFavouriteButton");
+      if (user.id !== id && favouriteButton) {
+        favouriteButton.hidden = false;
+        const {data:existingFavourite,error:favouriteReadError} = await supabase
+          .from("profile_favourites").select("profile_id").eq("user_id",user.id).eq("profile_id",id).maybeSingle();
+        if (favouriteReadError) throw favouriteReadError;
+        let isFavourite = !!existingFavourite;
+        const paintFavourite = () => {
+          favouriteButton.textContent = isFavourite ? "★ Favourite-ல் உள்ளது · நீக்க" : "☆ Favourite-ல் சேர்";
+          favouriteButton.classList.toggle("is-saved",isFavourite);
+        };
+        paintFavourite();
+        favouriteButton.addEventListener("click",async()=>{
+          favouriteButton.disabled=true;
+          try{
+            if(isFavourite){
+              const {error}=await supabase.from("profile_favourites").delete().eq("user_id",user.id).eq("profile_id",id);
+              if(error)throw error;
+              isFavourite=false;
+              $("favouriteActionMessage").textContent="Favourite பட்டியலிலிருந்து நீக்கப்பட்டது.";
+            }else{
+              const {error}=await supabase.from("profile_favourites").insert({user_id:user.id,profile_id:id});
+              if(error)throw error;
+              isFavourite=true;
+              $("favouriteActionMessage").textContent="Favourite பட்டியலில் சேர்க்கப்பட்டது.";
+            }
+            paintFavourite();
+          }catch(error){
+            $("favouriteActionMessage").textContent=error.code==="23505"?"ஏற்கனவே Favourite-ல் உள்ளது.":(error.message||"மாற்றம் செய்ய முடியவில்லை.");
+          }finally{favouriteButton.disabled=false;}
+        });
+      }
 
       const interestButton=$("sendInterestButton");
       if(user.id!==id){
