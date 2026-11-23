@@ -1,4 +1,4 @@
-const CACHE_NAME = "zhagaram-shell-v33";
+const CACHE_NAME = "zhagaram-shell-v34";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -11,6 +11,7 @@ const APP_SHELL = [
   "./profile.html",
   "./dashboard.html",
   "./dashboard-premium.css",
+  "./dashboard-ui.css",
   "./admin.html",
   "./owner.html",
   "./staff.html",
@@ -24,7 +25,9 @@ const APP_SHELL = [
   "./my-reports.html",
   "./my-favourites.html",
   "./match-preferences.html",
-  "./messages.html"
+  "./messages.html",
+  "./reset-password.html",
+  "./reset-password.js"
 ];
 
 self.addEventListener("install", (event) => {
