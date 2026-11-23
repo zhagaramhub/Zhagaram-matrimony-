@@ -32,3 +32,12 @@ body.member-home{margin:0;background:var(--zd-bg);color:var(--zd-ink);font-famil
 .bottom-nav-item:hover{color:#6d806e}
 @media(min-width:760px){.member-main{margin-top:38px}.member-profile-card{padding:25px}.member-bottom-nav{left:50%;right:auto;transform:translateX(-50%);width:min(760px,92%);bottom:16px;border:1px solid #eae5da;border-radius:18px;padding:8px}}
 @media(max-width:380px){.bottom-nav-item small{font-size:8px}.member-bottom-nav{padding-left:2px;padding-right:2px}}
+
+/* Clear dashboard shortcut to the member's saved favourite profiles */
+.dashboard-favourites-button{display:flex;align-items:center;gap:14px;margin-top:16px;padding:16px 18px;min-height:76px;border:1px solid #e5dcc7;border-radius:16px;background:linear-gradient(110deg,#fffefa,#f4f0e5);box-shadow:0 7px 20px #344b3b09;color:#496353;text-decoration:none;transition:border-color .18s,transform .18s}
+.dashboard-favourites-button:hover{border-color:#c9b477;transform:translateY(-1px)}
+.dashboard-favourites-icon{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;border-radius:13px;background:#f4e9e4;color:#a34e4a;font-size:23px}
+.dashboard-favourites-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:5px}
+.dashboard-favourites-copy strong{font-size:13px;color:#29483d}
+.dashboard-favourites-copy small{font-size:10px;line-height:1.5;color:#85877e}
+.dashboard-favourites-button>b{font-size:20px;color:#a38a5d}
