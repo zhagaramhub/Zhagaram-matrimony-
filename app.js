@@ -340,7 +340,6 @@ if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
   });
 }
 
-const ZHAGARAM_PUSH_PUBLIC_KEY = "BMiHgEBp1_cRzVLQJoSz6tGYSq4Nt44HflK87NTKEweSmPYK75k5QVGzBQM0L2jLD-unL8o0VztB8DFM3yswLOY";
 function pushKeyBytes(value) {
   const padding = "=".repeat((4 - value.length % 4) % 4);
   const raw = atob((value + padding).replace(/-/g, "+").replace(/_/g, "/"));
@@ -352,13 +351,22 @@ async function enableZhagaramPush(userId) {
   }
   const permission = await Notification.requestPermission();
   if (permission !== "granted") throw new Error("Notification அனுமதி வழங்கப்படவில்லை. Browser Settings-ல் அனுமதிக்கவும்.");
+  const { data: savedPublicKey, error: keyError } = await supabase.rpc("get_push_public_key");
+  if (keyError) throw keyError;
+  let publicKey = savedPublicKey;
+  if (!publicKey) {
+    const { data: setupData, error: setupError } = await supabase.functions.invoke("setup-push-keys");
+    if (setupError) throw setupError;
+    publicKey = setupData?.publicKey;
+  }
+  if (!publicKey) throw new Error("முதலில் Owner Push Notification அமைப்பை இயக்க வேண்டும்.");
   const registration = await navigator.serviceWorker.register("./sw.js");
   await navigator.serviceWorker.ready;
   let subscription = await registration.pushManager.getSubscription();
   if (!subscription) {
     subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: pushKeyBytes(ZHAGARAM_PUSH_PUBLIC_KEY)
+      applicationServerKey: pushKeyBytes(publicKey)
     });
   }
   const { error } = await supabase.from("push_subscriptions").upsert({
