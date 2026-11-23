@@ -212,12 +212,42 @@ const renderLiveProfiles=()=>{
  grid.innerHTML=filtered.map(p=>{const name=searchEscape(p.full_name||"Zhagaram Member");const age=profileAge(p.date_of_birth);const place=[p.city,p.district,p.state].filter(Boolean).map(searchEscape).join(", ");const details=[p.religion,p.education,p.occupation].filter(Boolean).map(searchEscape);const initials=searchEscape((p.full_name||"Z").trim().charAt(0).toUpperCase());return '<a class="profile-card" href="view-profile.html?id='+encodeURIComponent(p.id)+'" aria-label="'+name+' விவரங்களைப் பார்க்க"><div class="profile-visual visual-a"><span>'+initials+'</span></div><div class="profile-info"><span class="profile-id">'+searchEscape(p.member_id||"ZHAGARAM MEMBER")+'</span><h3>'+name+(p.is_verified?' <span class="verified-badge">✓ சரிபார்க்கப்பட்டது</span>':'')+'</h3><p>'+(age!==null?age+" வயது":"வயது விவரம் இல்லை")+(place?" · "+place:"")+'</p><div class="profile-meta">'+(details.length?details.join(" · "):"விவரங்கள் விரைவில்")+'</div><span class="profile-open-link">விவரங்களைப் பார்க்க →</span></div></a>'}).join("");
  if($("emptyState"))$("emptyState").hidden=filtered.length!==0;
 };
+const scoreMatchProfile=(profile,preferences)=>{
+ const checks=[];
+ const add=(configured,matched)=>{if(configured)checks.push(Boolean(matched))};
+ const same=(a,b)=>String(a??"").trim().toLocaleLowerCase()===String(b??"").trim().toLocaleLowerCase();
+ const age=profileAge(profile.date_of_birth);
+ if(preferences.looking_for)add(true,profile.gender===preferences.looking_for);
+ if(preferences.min_age!==null||preferences.max_age!==null)add(true,age!==null&&(preferences.min_age===null||age>=preferences.min_age)&&(preferences.max_age===null||age<=preferences.max_age));
+ if(preferences.min_height_cm!==null||preferences.max_height_cm!==null)add(true,profile.height_cm!==null&&profile.height_cm!==undefined&&(preferences.min_height_cm===null||profile.height_cm>=preferences.min_height_cm)&&(preferences.max_height_cm===null||profile.height_cm<=preferences.max_height_cm));
+ for(const [key,column] of [["religion","religion"],["community","community"],["sub_community","sub_community"],["marital_status","marital_status"],["city","city"],["district","district"],["state","state"]]){
+  if(preferences[key])add(true,same(profile[column],preferences[key]));
+ }
+ if(!checks.length)return null;
+ return Math.round(checks.filter(Boolean).length/checks.length*100);
+};
+const renderSmartMatches=(preferences,userId)=>{
+ const section=$("smartMatchesSection"),grid=$("smartMatchGrid"),empty=$("smartMatchEmpty");
+ if(!section||!grid)return;
+ const hasPreferences=Object.entries(preferences||{}).some(([key,value])=>key!=="user_id"&&key!=="created_at"&&key!=="updated_at"&&value!==null&&value!=="");
+ if(!hasPreferences){section.hidden=true;return}
+ section.hidden=false;
+ const ranked=liveSearchProfiles.filter(p=>p.id!==userId).map(p=>({profile:p,score:scoreMatchProfile(p,preferences)})).filter(x=>x.score!==null).sort((a,b)=>b.score-a.score);
+ grid.innerHTML=ranked.slice(0,12).map(({profile:p,score})=>{
+  const name=searchEscape(p.full_name||"Zhagaram Member"),age=profileAge(p.date_of_birth);
+  const place=[p.city,p.district,p.state].filter(Boolean).map(searchEscape).join(", ");
+  const details=[p.religion,p.education,p.occupation].filter(Boolean).map(searchEscape);
+  const initials=searchEscape((p.full_name||"Z").trim().charAt(0).toUpperCase());
+  return '<a class="profile-card" href="view-profile.html?id='+encodeURIComponent(p.id)+'" aria-label="'+name+' - '+score+'% பொருத்தம்"><div class="profile-visual visual-a"><span>'+initials+'</span></div><div class="profile-info"><span class="profile-id">'+searchEscape(p.member_id||"ZHAGARAM MEMBER")+' · <strong>'+score+'% Preference Match</strong></span><h3>'+name+(p.is_verified?' <span class="verified-badge">✓ சரிபார்க்கப்பட்டது</span>':'')+'</h3><p>'+(age!==null?age+" வயது":"வயது விவரம் இல்லை")+(place?" · "+place:"")+'</p><div class="profile-meta">'+(details.length?details.join(" · "):"விவரங்கள் விரைவில்")+'</div><span class="profile-open-link">விவரங்களைப் பார்க்க →</span></div></a>';
+ }).join("");
+ empty.hidden=ranked.length!==0;
+};
 const loadLiveProfiles=async()=>{
  const status=$("searchMessage");if(!status)return;
  try{const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;
   if(!user){status.innerHTML='உறுப்பினர் Profiles பார்க்க <a href="login.html">உள்நுழையுங்கள்</a>.';return}
   const {data,error}=await supabase.from("profiles").select("id,member_id,full_name,date_of_birth,gender,religion,community,sub_community,education,occupation,height_cm,marital_status,city,district,state,is_verified").eq("profile_status","active").order("created_at",{ascending:false}).limit(100);
-  if(error)throw error;liveSearchProfiles=data||[];status.hidden=true;renderLiveProfiles();
+  if(error)throw error;liveSearchProfiles=data||[];const {data:preferences,error:preferencesError}=await supabase.from("match_preferences").select("*").eq("user_id",user.id).maybeSingle();if(preferencesError)throw preferencesError;status.hidden=true;renderLiveProfiles();renderSmartMatches(preferences,user.id);
   if($("emptyState")&&liveSearchProfiles.length===0){$("emptyState").textContent="இன்னும் அங்கீகரிக்கப்பட்ட Profiles இல்லை.";$("emptyState").hidden=false}
  }catch(error){status.textContent="Profiles ஏற்ற முடியவில்லை: "+(error.message||"மீண்டும் முயற்சிக்கவும்.");}
 };
