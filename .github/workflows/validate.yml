@@ -1,0 +1,68 @@
+name: Validate Zhagaram Matrimony
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check --input-type=module < app.js
+          node --check --input-type=module < reset-password.js
+          node --check sw.js
+
+      - name: Check local page links and duplicate IDs
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from html.parser import HTMLParser
+          import re
+          import sys
+
+          class PageAudit(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.ids = []
+                  self.refs = []
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  if attrs.get("id"):
+                      self.ids.append(attrs["id"])
+                  for key in ("href", "src"):
+                      value = attrs.get(key, "")
+                      if value:
+                          self.refs.append(value)
+
+          errors = []
+          root = Path(".")
+          for page in sorted(root.glob("*.html")):
+              audit = PageAudit()
+              audit.feed(page.read_text(encoding="utf-8"))
+              duplicates = sorted({item for item in audit.ids if audit.ids.count(item) > 1})
+              if duplicates:
+                  errors.append(f"{page}: duplicate IDs: {', '.join(duplicates)}")
+              for ref in audit.refs:
+                  if ref.startswith(("#", "http://", "https://", "mailto:", "tel:", "data:", "javascript:")):
+                      continue
+                  target = ref.split("?", 1)[0].split("#", 1)[0]
+                  if target and not target.startswith("/") and not (root / target).exists():
+                      errors.append(f"{page}: missing local reference {ref}")
+          if errors:
+              print("\n".join(errors))
+              sys.exit(1)
+          print("HTML links and IDs passed.")
+          PY
