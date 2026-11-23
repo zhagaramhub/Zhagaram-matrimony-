@@ -230,8 +230,8 @@ const renderSmartMatches=(preferences,userId)=>{
  const section=$("smartMatchesSection"),grid=$("smartMatchGrid"),empty=$("smartMatchEmpty");
  if(!section||!grid)return;
  const hasPreferences=Object.entries(preferences||{}).some(([key,value])=>key!=="user_id"&&key!=="created_at"&&key!=="updated_at"&&value!==null&&value!=="");
- if(!hasPreferences){section.hidden=true;return}
  section.hidden=false;
+ if(!hasPreferences){grid.innerHTML='';empty.hidden=false;empty.textContent='முதலில் Match Preferences-ல் உங்கள் விருப்பங்களைச் சேமிக்கவும்.';return}
  const ranked=liveSearchProfiles.filter(p=>p.id!==userId).map(p=>({profile:p,score:scoreMatchProfile(p,preferences)})).filter(x=>x.score!==null).sort((a,b)=>b.score-a.score);
  grid.innerHTML=ranked.slice(0,12).map(({profile:p,score})=>{
   const name=searchEscape(p.full_name||"Zhagaram Member"),age=profileAge(p.date_of_birth);
@@ -247,7 +247,7 @@ const loadLiveProfiles=async()=>{
  try{const {data:{user},error:userError}=await supabase.auth.getUser();if(userError)throw userError;
   if(!user){status.innerHTML='உறுப்பினர் Profiles பார்க்க <a href="login.html">உள்நுழையுங்கள்</a>.';return}
   const {data,error}=await supabase.from("profiles").select("id,member_id,full_name,date_of_birth,gender,religion,community,sub_community,education,occupation,height_cm,marital_status,city,district,state,is_verified").eq("profile_status","active").order("created_at",{ascending:false}).limit(100);
-  if(error)throw error;liveSearchProfiles=data||[];const {data:preferences,error:preferencesError}=await supabase.from("match_preferences").select("*").eq("user_id",user.id).maybeSingle();if(preferencesError)throw preferencesError;status.hidden=true;renderLiveProfiles();renderSmartMatches(preferences,user.id);
+  if(error)throw error;liveSearchProfiles=data||[];status.hidden=true;renderLiveProfiles();let preferences=null;const preferenceResult=await supabase.from("match_preferences").select("*").eq("user_id",user.id).maybeSingle();if(preferenceResult.error){console.error("Match preferences load error:",preferenceResult.error);renderSmartMatches(null,user.id);$("smartMatchEmpty").textContent="Match Preferences ஏற்ற முடியவில்லை. மீண்டும் உள்நுழைந்து முயற்சிக்கவும்.";}else{preferences=preferenceResult.data;renderSmartMatches(preferences,user.id);}
   if($("emptyState")&&liveSearchProfiles.length===0){$("emptyState").textContent="இன்னும் அங்கீகரிக்கப்பட்ட Profiles இல்லை.";$("emptyState").hidden=false}
  }catch(error){status.textContent="Profiles ஏற்ற முடியவில்லை: "+(error.message||"மீண்டும் முயற்சிக்கவும்.");}
 };
