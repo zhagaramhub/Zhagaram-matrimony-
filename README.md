@@ -8,6 +8,7 @@ https://zhagaramhub.github.io/Zhagaram-matrimony-/
 ## Implemented features
 - Email registration, email/password login and password reset
 - Member profile creation and editing, family details and private profile-photo storage
+- Legal minimum-age validation and adult-only member discovery (Groom 21+, Bride 18+)
 - Member IDs and profile approval / rejection / suspension workflow
 - Admin verification badges with verification history
 - Profile search and Smart Match recommendations based on saved preferences
