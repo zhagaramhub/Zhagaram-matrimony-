@@ -25,6 +25,9 @@ jobs:
           node --check --input-type=module < reset-password.js
           node --check sw.js
 
+      - name: Run automated QA smoke tests
+        run: node scripts/qa-smoke.mjs
+
       - name: Check local page links and duplicate IDs
         run: |
           python3 - <<'PY'
