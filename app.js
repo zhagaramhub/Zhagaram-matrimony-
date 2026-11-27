@@ -280,7 +280,7 @@ if($("forgotPassword"))$("forgotPassword").addEventListener("click",async()=>{
   const email=$("loginEmail").value.trim();
   if(!email){setMessage("authMessage","Enter your email address first.",true);$("loginEmail").focus();return;}
   setMessage("authMessage","Sending password reset link...");
-  try{const {error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo:new URL("reset-password.html",location.href).href});if(error)throw error;setMessage("authMessage","Password reset link sent. Please check your email.");}
+  try{const {error}=await supabase.auth.resetPasswordForEmail(email,{redirectTo:"https://zhagaramhub.github.io/Zhagaram-matrimony-/reset-password.html"});if(error)throw error;setMessage("authMessage","Password reset link sent. Please check your email.");}
   catch(error){setMessage("authMessage",error.message||"Could not send reset link.",true);}
 });
 if($("sendPhoneOtp"))$("sendPhoneOtp").addEventListener("click",async()=>{
